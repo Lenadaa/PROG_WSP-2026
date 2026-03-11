@@ -1,4 +1,3 @@
-@ -1 +1,8 @@
 # PROG_WSP-2026
 # Concurrent programming
 
