@@ -29,14 +29,14 @@ namespace TP.ConcurrentProgramming.Fundamentals.Test
       EnvelopePool<IEnvelope> envelopePool = new(source => new Mock<IEnvelope>().Object);
 
       // Act & Assert
-      Assert.ThrowsException<NullReferenceException>(() => envelopePool.ReturnEmptyEnvelope(null));
+      Assert.ThrowsException<NullReferenceException>(() => envelopePool.ReturnEmptyEnvelope(null!));
     }
 
     [TestMethod]
     public void GetEmptyEnvelope_WhenPoolIsEmpty_CreatesNewEnvelope()
     {
       // Arrange
-      IEnvelope? mockEnvelope = null;
+      IEnvelope? mockEnvelope = null!;
       EnvelopePool<IEnvelope> envelopePool = new(envelopePoo => { mockEnvelope = new DTOFixture(envelopePoo); return mockEnvelope; });
 
       // Act

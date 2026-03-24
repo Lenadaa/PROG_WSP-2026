@@ -44,8 +44,9 @@ namespace TP.ConcurrentProgramming.Presentation.Model.Test
 
     private class BusinessLogicIBallFixture : BusinessLogic.IBall
     {
+      #pragma warning disable CS0067
       public event EventHandler<IPosition>? NewPositionNotification;
-
+      #pragma warning restore CS0067
       public void Dispose()
       {
         throw new NotImplementedException();

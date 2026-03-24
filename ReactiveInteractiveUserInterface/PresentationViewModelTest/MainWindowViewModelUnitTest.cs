@@ -163,9 +163,9 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel.Test
         public double Left => throw new NotImplementedException();
 
         #region INotifyPropertyChanged
-
+        #pragma warning disable CS0067
         public event PropertyChangedEventHandler? PropertyChanged;
-
+        #pragma warning restore CS0067
         #endregion INotifyPropertyChanged
 
         #endregion IBall

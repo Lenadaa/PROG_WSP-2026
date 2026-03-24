@@ -109,7 +109,7 @@ namespace TP.ConcurrentProgramming.Communication
       {
         if (!m_Openned) throw new InvalidOperationException("Port is closed");
         m_Queue.Enqueue(mess);
-        mess = null;
+        mess = null!;
         m_NumOfMess++;
         m_AtLeastOneMessageInQueue?.Send();
       }
@@ -135,7 +135,7 @@ namespace TP.ConcurrentProgramming.Communication
     {
       bool res = false;
       EnterMonitor();
-      mess = null;
+      mess = null!;
       try
       {
         if ((m_NumOfMess == 0) & m_Openned)
@@ -164,7 +164,7 @@ namespace TP.ConcurrentProgramming.Communication
 
     private bool m_Openned = false;
     private Queue<IEnvelope> m_Queue = new Queue<IEnvelope>();
-    private readonly ICondition? m_AtLeastOneMessageInQueue = null;
+    private readonly ICondition? m_AtLeastOneMessageInQueue = null!;
     private int m_NumOfMess = 0;
 
     private IEnvelope Dequeue()

@@ -21,7 +21,7 @@ namespace TP.ConcurrentProgramming.Communication.Test
       using (EventsExchange<string> eventsExchange = new EventsExchange<string>())
       {
         // Act & Assert
-        Assert.ThrowsException<ArgumentNullException>(() => eventsExchange.SetEvent(null));
+        Assert.ThrowsException<ArgumentNullException>(() => eventsExchange.SetEvent(null!));
       }
     }
 
@@ -51,7 +51,7 @@ namespace TP.ConcurrentProgramming.Communication.Test
       // Arrange
       string testEvent = "TestEvent";
       string? result = string.Empty;
-      Thread? newThread = null;
+      Thread? newThread = null!;
       using (EventsExchange<string> eventsExchange = new())
       {
         newThread = new Thread(() => eventsExchange.SetEvent(testEvent));
@@ -71,7 +71,7 @@ namespace TP.ConcurrentProgramming.Communication.Test
       // Arrange
       string testEvent = "TestEvent";
       string? result = string.Empty;
-      Thread? getEventThread = null;
+      Thread? getEventThread = null!;
       using (EventsExchange<string> eventsExchange = new())
       {
         // Act

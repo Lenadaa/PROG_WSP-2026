@@ -108,14 +108,15 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
         public double x { get; init; }
         public double y { get; init; }
       }
+#pragma warning disable CS0067
 
       private class DataBallFixture : Data.IBall
       {
         public IVector Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public event EventHandler<IVector>? NewPositionNotification = null;
+        public event EventHandler<IVector>? NewPositionNotification;
       }
     }
+#pragma warning restore CS0067
 
     #endregion testing instrumentation
   }
