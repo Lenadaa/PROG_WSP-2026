@@ -7,7 +7,7 @@ public abstract class ModelAbstract
 {
     public abstract void Start(int ballCount, double width, double height);
     public abstract List<IBall> GetBalls();
-    public abstract void UpdateTick(); 
+    public abstract void UpdateTheState(); 
 
     public static ModelAbstract Create(LogicAbstract? logic = null)
     {

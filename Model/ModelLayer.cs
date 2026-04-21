@@ -19,5 +19,5 @@ internal class ModelLayer : ModelAbstract
 
     public override List<IBall> GetBalls() => _logic.GetBalls();
     
-    public override void UpdateTick() => _logic.UpdateTheState();
+    public override void UpdateTheState() => _logic.UpdateTheState();
 }

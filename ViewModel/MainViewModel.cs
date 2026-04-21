@@ -68,7 +68,7 @@ public class MainViewModel : ViewModelBase
     {
         while (_isMoving)
         {
-            _model.UpdateTick(); 
+            _model.UpdateTheState(); 
             await Task.Delay(16);
         }
     }
