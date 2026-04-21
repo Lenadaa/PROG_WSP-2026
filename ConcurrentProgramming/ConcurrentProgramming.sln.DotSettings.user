@@ -1,0 +1,8 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6692eb5f_002D2513_002D4dc3_002D9a12_002D829455e76deb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from UnitTest1.cs" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::7677FC09-822B-406F-9E6F-D45D8E95BA99::net10.0::BallsTests.BallMovement.CheckIfBallMove&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::F9172950-11F1-4220-B422-782B8E1D96B0::net10.0::LogicAbstractTest.Test1.Ball_ShouldBounceOffWall&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::F9172950-11F1-4220-B422-782B8E1D96B0::net10.0::LogicAbstractTest.LogicTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
