@@ -116,4 +116,26 @@ public sealed class LogicTests
 
         Assert.IsTrue(ball.Velocity.X > 0 && ball.Velocity.Y > 0);
     }
+
+    [TestMethod]
+    public void VelocityDoesNotChangeAfterBounce()
+    {
+        var stub = new DataStub();
+        var ball = new Ball(100, 100);
+        ball.Position.X = 1;
+        ball.Position.Y = 1;
+        ball.Velocity.X = -2;
+        ball.Velocity.Y = -2;
+        stub.TestBalls.Add(ball);
+        
+        double speedBefore = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
+        
+        var logic = LogicAbstract.CreateAPI(stub);
+        logic.CreateScene(1, 100, 100); 
+        logic.UpdateTheState();
+        
+        double speedAfter = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
+        
+        Assert.AreEqual(speedBefore, speedAfter);
+    }
 }

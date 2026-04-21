@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj": {}
+    "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj": {}
   },
   "projects": {
-    "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
+    "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj",
+        "projectUniqueName": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj",
         "projectName": "Data",
-        "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj",
-        "packagesPath": "C:\\Users\\JOrli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\obj\\",
+        "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj",
+        "packagesPath": "C:\\Users\\izabe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\JOrli\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\izabe\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -40,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -61,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Users\\izabe\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -339,32 +337,30 @@
         }
       }
     },
-    "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj": {
+    "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj",
+        "projectUniqueName": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj",
         "projectName": "Logic",
-        "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj",
-        "packagesPath": "C:\\Users\\JOrli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\obj\\",
+        "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj",
+        "packagesPath": "C:\\Users\\izabe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\JOrli\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\izabe\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
-                "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj"
+              "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
+                "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj"
               }
             }
           }
@@ -379,7 +375,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -400,7 +396,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Users\\izabe\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -678,35 +674,33 @@
         }
       }
     },
-    "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\Model.csproj": {
+    "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\Model.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\Model.csproj",
+        "projectUniqueName": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\Model.csproj",
         "projectName": "Model",
-        "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\Model.csproj",
-        "packagesPath": "C:\\Users\\JOrli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\obj\\",
+        "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\Model.csproj",
+        "packagesPath": "C:\\Users\\izabe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\JOrli\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\izabe\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
-                "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Data\\Data.csproj"
+              "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj": {
+                "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Data\\Data.csproj"
               },
-              "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj": {
-                "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj"
+              "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj": {
+                "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Logic\\Logic.csproj"
               }
             }
           }
@@ -721,7 +715,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -742,7 +736,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Users\\izabe\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1020,32 +1014,30 @@
         }
       }
     },
-    "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj": {
+    "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj",
+        "projectUniqueName": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj",
         "projectName": "ViewModel",
-        "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj",
-        "packagesPath": "C:\\Users\\JOrli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\ViewModel\\obj\\",
+        "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\ViewModel\\ViewModel.csproj",
+        "packagesPath": "C:\\Users\\izabe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\ViewModel\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\JOrli\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\izabe\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\Model.csproj": {
-                "projectPath": "C:\\Users\\JOrli\\OneDrive\\Pulpit\\Sems 4\\Współbiegi\\PROG_WSP-2026\\Model\\Model.csproj"
+              "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\Model.csproj": {
+                "projectPath": "C:\\Users\\izabe\\Desktop\\Informatyka Stosowana I\\2026 (IV semestr)\\współbiegi\\PROG_WSP-2026\\Model\\Model.csproj"
               }
             }
           }
@@ -1060,7 +1052,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -1081,7 +1073,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Users\\izabe\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

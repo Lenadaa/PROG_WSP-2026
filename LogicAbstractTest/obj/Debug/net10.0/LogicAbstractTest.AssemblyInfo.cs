@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LogicAbstractTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4279259d8e41fec696c87323ea15eaa143a917c1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13ef3aa388042c39b62dd3a184fa89c13f539444")]
 [assembly: System.Reflection.AssemblyProductAttribute("LogicAbstractTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LogicAbstractTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

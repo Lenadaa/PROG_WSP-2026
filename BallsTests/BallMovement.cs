@@ -36,4 +36,18 @@ public sealed class BallMovement
         Assert.AreEqual(initialX + vx, ball.Position.X);
         Assert.AreEqual(initialY + vy, ball.Position.Y);
     }
+
+    [TestMethod]
+    public void MoveDoesNotChangeVelocity()
+    {
+        var ball = new Ball(100, 100);
+        
+        double vx = ball.Velocity.X;
+        double vy = ball.Velocity.Y;
+        
+        ball.Move();
+        
+        Assert.AreEqual(vx, ball.Velocity.X);
+        Assert.AreEqual(vy, ball.Velocity.Y);
+    }
 }

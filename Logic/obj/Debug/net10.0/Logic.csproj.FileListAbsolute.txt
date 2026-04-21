@@ -30,3 +30,19 @@ C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\Logic\obj\Debug
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\refint\Logic.dll
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.pdb
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\ref\Logic.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\bin\Debug\net10.0\Logic.deps.json
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\bin\Debug\net10.0\Logic.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\bin\Debug\net10.0\Logic.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\bin\Debug\net10.0\Data.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\bin\Debug\net10.0\Data.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.csproj.AssemblyReference.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.AssemblyInfoInputs.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.AssemblyInfo.cs
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.csproj.CoreCompileInputs.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.sourcelink.json
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.csproj.Up2Date
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\refint\Logic.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\Logic.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\Logic\obj\Debug\net10.0\ref\Logic.dll

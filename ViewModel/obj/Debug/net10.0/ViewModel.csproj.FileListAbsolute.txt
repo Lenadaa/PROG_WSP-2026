@@ -38,3 +38,23 @@ C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\ViewModel\obj\D
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\refint\ViewModel.dll
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.pdb
 C:\Users\JOrli\OneDrive\Pulpit\Sems 4\Współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ref\ViewModel.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\ViewModel.deps.json
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\ViewModel.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\ViewModel.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Data.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Logic.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Model.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Model.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Data.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\bin\Debug\net10.0\Logic.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.csproj.AssemblyReference.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.AssemblyInfoInputs.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.AssemblyInfo.cs
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.csproj.CoreCompileInputs.cache
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.sourcelink.json
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.csproj.Up2Date
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\refint\ViewModel.dll
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ViewModel.pdb
+C:\Users\izabe\Desktop\Informatyka Stosowana I\2026 (IV semestr)\współbiegi\PROG_WSP-2026\ViewModel\obj\Debug\net10.0\ref\ViewModel.dll
