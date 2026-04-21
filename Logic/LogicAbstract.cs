@@ -13,7 +13,7 @@ public abstract class LogicAbstract
     public abstract void CreateScene(int ballCount, double width, double height);
     
     // @brief Updates the state of the scene
-    public abstract void UpdateTick();
+    public abstract void UpdateTheState();
     public abstract List<IBall> GetBalls();
 
     // @brief Creates new instance of LogicLayerImplementation
@@ -44,7 +44,7 @@ internal class LogicLayerImplementation : LogicAbstract
 
     public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
 
-    public override void UpdateTick()
+    public override void UpdateTheState()
     {
         if (_board == null) return;
 

@@ -31,7 +31,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTick();
+        logic.UpdateTheState();
 
         Assert.IsTrue(ball.Velocity.X > 0);
     }
@@ -48,7 +48,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTick();
+        logic.UpdateTheState();
 
         Assert.IsTrue(ball.Velocity.X < 0);
     }
@@ -75,7 +75,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTick();
+        logic.UpdateTheState();
 
         Assert.IsTrue(ball.Velocity.Y > 0);
     }
@@ -93,7 +93,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTick();
+        logic.UpdateTheState();
 
         Assert.IsTrue(ball.Velocity.Y < 0);
     }
@@ -112,7 +112,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTick();
+        logic.UpdateTheState();
 
         Assert.IsTrue(ball.Velocity.X > 0 && ball.Velocity.Y > 0);
     }
