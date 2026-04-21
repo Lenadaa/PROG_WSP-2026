@@ -1,0 +1,108 @@
+\doxysection{Logic.\+Logic\+Layer\+Implementation Class Reference}
+\hypertarget{class_logic_1_1_logic_layer_implementation}{}\label{class_logic_1_1_logic_layer_implementation}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+Inheritance diagram for Logic.\+Logic\+Layer\+Implementation:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_logic_1_1_logic_layer_implementation}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_acaed87218491036c6c9fcb1a8ba54476}{Logic\+Layer\+Implementation}} (\doxymbox{\hyperlink{class_data_1_1_data_abstract}{Data\+Abstract}} data)
+\item 
+override void \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_a5ee1462ecd578803c52a5c5e999dcc44}{Create\+Scene}} (int ball\+Count, double width, double height)
+\item 
+override List$<$ \doxymbox{\hyperlink{interface_data_1_1_i_ball}{IBall}} $>$ \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_a5136e21bcc47052876fd0b41dacc5282}{Get\+Balls}} ()
+\item 
+override void \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_ac4e618c70f44f9bbc2f56384fcf7b246}{Update\+Tick}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_logic_1_1_logic_abstract}{Logic.\+Logic\+Abstract}}}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{class_logic_1_1_logic_abstract_a975cef801da0266d7612dafc468c311e}{Create\+Scene}} (int ball\+Count, double width, double height)
+\item 
+void \doxymbox{\hyperlink{class_logic_1_1_logic_abstract_a8ef240867e1dad645e7de495cbf2e363}{Update\+Tick}} ()
+\item 
+List$<$ \doxymbox{\hyperlink{interface_data_1_1_i_ball}{IBall}} $>$ \doxymbox{\hyperlink{class_logic_1_1_logic_abstract_af3eed3b768972ce2ff68b36030aafd42}{Get\+Balls}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_a2cbdb68af3d73dcb02f7ef7ca1e32c88}{Boundary\+Col}} (\doxymbox{\hyperlink{interface_data_1_1_i_ball}{IBall}} ball)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+readonly \doxymbox{\hyperlink{class_data_1_1_data_abstract}{Data\+Abstract}} \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_ae969eea0a382405a6579031134f9c598}{\+\_\+data}}
+\item 
+\doxymbox{\hyperlink{class_logic_1_1_board}{Board}}? \doxymbox{\hyperlink{class_logic_1_1_logic_layer_implementation_a5f279b5f7b6990edf236bb2a391e097a}{\+\_\+board}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Member Functions inherited from \doxymbox{\hyperlink{class_logic_1_1_logic_abstract}{Logic.\+Logic\+Abstract}}}
+\begin{DoxyCompactItemize}
+\item 
+static \doxymbox{\hyperlink{class_logic_1_1_logic_abstract}{Logic\+Abstract}} \doxymbox{\hyperlink{class_logic_1_1_logic_abstract_ac4a1c3568286eac75a1cdb35a168fa46}{Create\+API}} (\doxymbox{\hyperlink{class_data_1_1_data_abstract}{Data\+Abstract}} data=null)
+\end{DoxyCompactItemize}
+
+
+\label{doc-constructors}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_acaed87218491036c6c9fcb1a8ba54476}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!LogicLayerImplementation@{LogicLayerImplementation}}
+\index{LogicLayerImplementation@{LogicLayerImplementation}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{LogicLayerImplementation()}{LogicLayerImplementation()}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_acaed87218491036c6c9fcb1a8ba54476} 
+Logic.\+Logic\+Layer\+Implementation.\+Logic\+Layer\+Implementation (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_data_1_1_data_abstract}{Data\+Abstract}}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{doc-func-members}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_a2cbdb68af3d73dcb02f7ef7ca1e32c88}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!BoundaryCol@{BoundaryCol}}
+\index{BoundaryCol@{BoundaryCol}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{BoundaryCol()}{BoundaryCol()}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_a2cbdb68af3d73dcb02f7ef7ca1e32c88} 
+void Logic.\+Logic\+Layer\+Implementation.\+Boundary\+Col (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{interface_data_1_1_i_ball}{IBall}}}]{ball}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+\Hypertarget{class_logic_1_1_logic_layer_implementation_a5ee1462ecd578803c52a5c5e999dcc44}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!CreateScene@{CreateScene}}
+\index{CreateScene@{CreateScene}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{CreateScene()}{CreateScene()}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_a5ee1462ecd578803c52a5c5e999dcc44} 
+override void Logic.\+Logic\+Layer\+Implementation.\+Create\+Scene (\begin{DoxyParamCaption}\item[{int}]{ball\+Count}{, }\item[{double}]{width}{, }\item[{double}]{height}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_logic_1_1_logic_layer_implementation_a5136e21bcc47052876fd0b41dacc5282}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!GetBalls@{GetBalls}}
+\index{GetBalls@{GetBalls}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{GetBalls()}{GetBalls()}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_a5136e21bcc47052876fd0b41dacc5282} 
+override List$<$ \doxymbox{\hyperlink{interface_data_1_1_i_ball}{IBall}} $>$ Logic.\+Logic\+Layer\+Implementation.\+Get\+Balls (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_logic_1_1_logic_layer_implementation_ac4e618c70f44f9bbc2f56384fcf7b246}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!UpdateTick@{UpdateTick}}
+\index{UpdateTick@{UpdateTick}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{UpdateTick()}{UpdateTick()}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_ac4e618c70f44f9bbc2f56384fcf7b246} 
+override void Logic.\+Logic\+Layer\+Implementation.\+Update\+Tick (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{doc-variable-members}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_logic_1_1_logic_layer_implementation_a5f279b5f7b6990edf236bb2a391e097a}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!\_board@{\_board}}
+\index{\_board@{\_board}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{\_board}{\_board}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_a5f279b5f7b6990edf236bb2a391e097a} 
+\doxymbox{\hyperlink{class_logic_1_1_board}{Board}}? Logic.\+Logic\+Layer\+Implementation.\+\_\+board\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_logic_1_1_logic_layer_implementation_ae969eea0a382405a6579031134f9c598}\index{Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}!\_data@{\_data}}
+\index{\_data@{\_data}!Logic.LogicLayerImplementation@{Logic.LogicLayerImplementation}}
+\doxysubsubsection{\texorpdfstring{\_data}{\_data}}
+{\footnotesize\ttfamily \label{class_logic_1_1_logic_layer_implementation_ae969eea0a382405a6579031134f9c598} 
+readonly \doxymbox{\hyperlink{class_data_1_1_data_abstract}{Data\+Abstract}} Logic.\+Logic\+Layer\+Implementation.\+\_\+data\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+Logic/\+\doxymbox{\hyperlink{_logic_abstract_8cs}{Logic\+Abstract.\+cs}}\end{DoxyCompactItemize}

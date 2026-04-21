@@ -2,12 +2,21 @@
 
 namespace Logic;
 
+/// <summary>
+/// @brief Abstract class for the logic layer.
+/// </summary>
 public abstract class LogicAbstract
 {
+    // @brief Creates the scene with the given parameters
+    // @param ballCount the number of balls on the board
+    // @param width the width of the board
     public abstract void CreateScene(int ballCount, double width, double height);
+    
+    // @brief Updates the state of the scene
     public abstract void UpdateTick();
     public abstract List<IBall> GetBalls();
 
+    // @brief Creates new instance of LogicLayerImplementation
     public static LogicAbstract CreateAPI(DataAbstract data = null)
     {
         return new LogicLayerImplementation(data ?? DataAbstract.CreateAPI());
@@ -17,7 +26,7 @@ public abstract class LogicAbstract
 internal class LogicLayerImplementation : LogicAbstract
 {
     private readonly DataAbstract _data;
-    private Board? _board; // Nasz nowy obiekt planszy
+    private Board? _board; 
 
     public LogicLayerImplementation(DataAbstract data)
     {

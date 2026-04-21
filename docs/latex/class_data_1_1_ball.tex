@@ -1,0 +1,189 @@
+\doxysection{Data.\+Ball Class Reference}
+\hypertarget{class_data_1_1_ball}{}\label{class_data_1_1_ball}\index{Data.Ball@{Data.Ball}}
+
+
+\doxylink{class_data_1_1_ball}{Ball} implementation.  
+
+
+Inheritance diagram for Data.\+Ball:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_data_1_1_ball}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_data_1_1_ball_ae646e28cea5857ce89b55e132d52d9c8}{Ball}} (double maxX, double maxY)
+\item 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} \doxymbox{\hyperlink{class_data_1_1_ball_a41ffe1bf360c803446b5bfbb03b28516}{Get\+Position}} ()
+\item 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} \doxymbox{\hyperlink{class_data_1_1_ball_a0e058a6161f408592d4541e2880cf3ce}{Get\+Velocity}} ()
+\item 
+void \doxymbox{\hyperlink{class_data_1_1_ball_a995b3c29a2382b60fab0ae985508859e}{Move}} ()
+\begin{DoxyCompactList}\small\item\em Moves the ball by one step based on its velocity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \doxymbox{\hyperlink{class_data_1_1_ball_ae2dd2ca71898c62179e048cf56a9500f}{Raise\+Property\+Changed}} (\+[Caller\+Member\+Name]\+ string? property\+Name=null)
+\begin{DoxyCompactList}\small\item\em Raises the Property\+Changed event. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} \doxymbox{\hyperlink{class_data_1_1_ball_a72ba305f387ed96a649bc59cb792ef0e}{Position}}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Current postion of the ball in 2D. \end{DoxyCompactList}\item 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} \doxymbox{\hyperlink{class_data_1_1_ball_a1a6a28b555941e68f1ee57974f9fba2e}{Velocity}}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Current velocity vector of the ball. \end{DoxyCompactList}\item 
+double \doxymbox{\hyperlink{class_data_1_1_ball_a984c45c42f8d3f171c184c5e025d8663}{Radius}} = 10.\+0\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+Property\+Changed\+Event\+Handler? \doxymbox{\hyperlink{class_data_1_1_ball_a83031a983170510fbb5af3e1387aa777}{Property\+Changed}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \doxymbox{\hyperlink{class_data_1_1_ball_a2745a4e24ae80e6d4fff1fd865dbb87c}{Generate\+Random}} (double min, double max)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static readonly Random \doxymbox{\hyperlink{class_data_1_1_ball_aacfdeefaff8831ce78034433488a0767}{\+\_\+random}} = new()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{class_data_1_1_ball}{Ball} implementation. 
+
+\label{doc-constructors}
+\Hypertarget{class_data_1_1_ball_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_data_1_1_ball_ae646e28cea5857ce89b55e132d52d9c8}\index{Data.Ball@{Data.Ball}!Ball@{Ball}}
+\index{Ball@{Ball}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{Ball()}{Ball()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_ae646e28cea5857ce89b55e132d52d9c8} 
+Data.\+Ball.\+Ball (\begin{DoxyParamCaption}\item[{double}]{maxX}{, }\item[{double}]{maxY}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{doc-func-members}
+\Hypertarget{class_data_1_1_ball_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_data_1_1_ball_a2745a4e24ae80e6d4fff1fd865dbb87c}\index{Data.Ball@{Data.Ball}!GenerateRandom@{GenerateRandom}}
+\index{GenerateRandom@{GenerateRandom}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{GenerateRandom()}{GenerateRandom()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a2745a4e24ae80e6d4fff1fd865dbb87c} 
+double Data.\+Ball.\+Generate\+Random (\begin{DoxyParamCaption}\item[{double}]{min}{, }\item[{double}]{max}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}
+
+\Hypertarget{class_data_1_1_ball_a41ffe1bf360c803446b5bfbb03b28516}\index{Data.Ball@{Data.Ball}!GetPosition@{GetPosition}}
+\index{GetPosition@{GetPosition}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{GetPosition()}{GetPosition()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a41ffe1bf360c803446b5bfbb03b28516} 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} Data.\+Ball.\+Get\+Position (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_data_1_1_ball_a0e058a6161f408592d4541e2880cf3ce}\index{Data.Ball@{Data.Ball}!GetVelocity@{GetVelocity}}
+\index{GetVelocity@{GetVelocity}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{GetVelocity()}{GetVelocity()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a0e058a6161f408592d4541e2880cf3ce} 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} Data.\+Ball.\+Get\+Velocity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_data_1_1_ball_a995b3c29a2382b60fab0ae985508859e}\index{Data.Ball@{Data.Ball}!Move@{Move}}
+\index{Move@{Move}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{Move()}{Move()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a995b3c29a2382b60fab0ae985508859e} 
+void Data.\+Ball.\+Move (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Moves the ball by one step based on its velocity. 
+
+Calculates new X and Y from current position and velocity, then updates the position vector. 
+
+Implements \doxymbox{\hyperlink{interface_data_1_1_i_ball_a5df4fea3f809aa322c65b41a32ffc2ec}{Data.\+IBall}}.
+
+\Hypertarget{class_data_1_1_ball_ae2dd2ca71898c62179e048cf56a9500f}\index{Data.Ball@{Data.Ball}!RaisePropertyChanged@{RaisePropertyChanged}}
+\index{RaisePropertyChanged@{RaisePropertyChanged}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{RaisePropertyChanged()}{RaisePropertyChanged()}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_ae2dd2ca71898c62179e048cf56a9500f} 
+virtual void Data.\+Ball.\+Raise\+Property\+Changed (\begin{DoxyParamCaption}\item[{\+[\+Caller\+Member\+Name]\+ string?}]{property\+Name}{ = {\ttfamily null}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Raises the Property\+Changed event. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property\+Name} & Name of the changed property. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-variable-members}
+\Hypertarget{class_data_1_1_ball_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_data_1_1_ball_aacfdeefaff8831ce78034433488a0767}\index{Data.Ball@{Data.Ball}!\_random@{\_random}}
+\index{\_random@{\_random}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{\_random}{\_random}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_aacfdeefaff8831ce78034433488a0767} 
+readonly Random Data.\+Ball.\+\_\+random = new()\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}
+
+
+
+\label{doc-property-members}
+\Hypertarget{class_data_1_1_ball_doc-property-members}
+\doxysubsection{Property Documentation}
+\Hypertarget{class_data_1_1_ball_a72ba305f387ed96a649bc59cb792ef0e}\index{Data.Ball@{Data.Ball}!Position@{Position}}
+\index{Position@{Position}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{Position}{Position}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a72ba305f387ed96a649bc59cb792ef0e} 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} Data.\+Ball.\+Position\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Current postion of the ball in 2D. 
+
+
+
+Implements \doxymbox{\hyperlink{interface_data_1_1_i_ball_a57289dd567dd9805a54fdf9d0d5606ae}{Data.\+IBall}}.
+
+\Hypertarget{class_data_1_1_ball_a984c45c42f8d3f171c184c5e025d8663}\index{Data.Ball@{Data.Ball}!Radius@{Radius}}
+\index{Radius@{Radius}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{Radius}{Radius}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a984c45c42f8d3f171c184c5e025d8663} 
+double Data.\+Ball.\+Radius = 10.\+0\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \doxymbox{\hyperlink{interface_data_1_1_i_ball_af6d4fbd90b44b2aa67a25469e8f8cedb}{Data.\+IBall}}.
+
+\Hypertarget{class_data_1_1_ball_a1a6a28b555941e68f1ee57974f9fba2e}\index{Data.Ball@{Data.Ball}!Velocity@{Velocity}}
+\index{Velocity@{Velocity}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{Velocity}{Velocity}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a1a6a28b555941e68f1ee57974f9fba2e} 
+\doxymbox{\hyperlink{class_data_1_1_vector}{Vector}} Data.\+Ball.\+Velocity\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Current velocity vector of the ball. 
+
+
+
+Implements \doxymbox{\hyperlink{interface_data_1_1_i_ball_a3e1b2b763a5bae797b0394ea80dfea47}{Data.\+IBall}}.
+
+
+
+\label{doc-event-members}
+\Hypertarget{class_data_1_1_ball_doc-event-members}
+\doxysubsection{Event Documentation}
+\Hypertarget{class_data_1_1_ball_a83031a983170510fbb5af3e1387aa777}\index{Data.Ball@{Data.Ball}!PropertyChanged@{PropertyChanged}}
+\index{PropertyChanged@{PropertyChanged}!Data.Ball@{Data.Ball}}
+\doxysubsubsection{\texorpdfstring{PropertyChanged}{PropertyChanged}}
+{\footnotesize\ttfamily \label{class_data_1_1_ball_a83031a983170510fbb5af3e1387aa777} 
+Property\+Changed\+Event\+Handler? Data.\+Ball.\+Property\+Changed}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+Data/\+\doxymbox{\hyperlink{_ball_8cs}{Ball.\+cs}}\end{DoxyCompactItemize}
