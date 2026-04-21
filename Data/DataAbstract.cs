@@ -1,4 +1,6 @@
-﻿namespace Data;
+﻿using System.Collections.Generic;
+
+namespace Data;
 
 /// <summary>
 /// @brief Data layer.
