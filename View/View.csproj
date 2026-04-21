@@ -13,4 +13,9 @@
       <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="logo.png" />
+      <Resource Include="logo.png" />
+    </ItemGroup>
+
 </Project>

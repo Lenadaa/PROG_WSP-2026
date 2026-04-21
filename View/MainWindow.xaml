@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:ViewModel;assembly=ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="820">
-
+        Icon="logo.png"
+        Title="Kuleczki" Height="500" Width="820">
+    
     <Window.DataContext>
         <viewmodel:MainViewModel/>
     </Window.DataContext>
@@ -14,14 +15,14 @@
     <Border Padding="35">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="300"/>
-                <RowDefinition Height="60"/>
+                <RowDefinition Height="320"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <ItemsControl Grid.Row="0" ItemsSource="{Binding Balls}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Name="Canvas" Width="700" Height="300" Background="#155843"/>
+                        <Canvas Name="Canvas" Width="700" Height="300" Background="#363E6E"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
@@ -36,22 +37,33 @@
                     <DataTemplate>
                         <Ellipse Height="{Binding Radius}" 
                                  Width="{Binding Radius}" 
-                                 Fill="#FF0000"/>
+                                 Fill="#6276F6"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="start simulation" 
-                        Height="20" 
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Content="START" 
+                        Height="40" 
                         VerticalAlignment="Center" 
-                        Margin="230, 10, 50, 20" 
-                        Command="{Binding StartSimulationCommand}" />
-                
-                <StackPanel Margin="0, 0, 0, 20">
-                    <TextBlock Text="Ilość KUL" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <TextBox VerticalAlignment="Center" 
-                             Width="100" 
+                        Margin="0,10,10,10" 
+                        FontSize="15"
+                        Padding="10"
+                        FontWeight="Bold"
+                        Background="#310dc4"
+                        Foreground="White"
+                        Command="{Binding StartSimulationCommand}">
+                </Button>
+    
+                <StackPanel>
+                    <TextBlock
+                        Text="ILOŚĆ KULEK" 
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"
+                        Margin="0,5,0,0"/>
+                    <TextBox Width="100" 
+                             Height="20"
+                             Margin="0,5,0,0" 
                              Text="{Binding BallCount, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
             </StackPanel>
