@@ -46,7 +46,11 @@ public class MainViewModel : ViewModelBase
 
     private void StartSimulation()
     {
-        if (_isMoving) return; 
+        if (_isMoving)
+        {
+            _isMoving = false;
+            Balls.Clear();
+        }; 
 
         _model.Start(BallCount, 700, 300); 
         
