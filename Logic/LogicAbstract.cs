@@ -51,8 +51,8 @@ internal class LogicLayerImplementation : LogicAbstract
 
         foreach (var ball in _board.Balls)
         {
-            BoundaryCol(ball);
             ball.Move();
+            BoundaryCol(ball);
         }
     }
 
@@ -60,17 +60,45 @@ internal class LogicLayerImplementation : LogicAbstract
     {
         if (_board == null) return;
 
-        double nextX = ball.Position.X + ball.Velocity.X;
-        double nextY = ball.Position.Y + ball.Velocity.Y;
+        double currentX = ball.Position.X;
+        double currentY = ball.Position.Y;
+        double vx = ball.Velocity.X;
+        double vy = ball.Velocity.Y;
+        double maxX = _board.Width - ball.Radius;
+        double maxY = _board.Height - ball.Radius;
 
-        if (nextX < 0 || nextX + ball.Radius > _board.Width)
+        while (currentX < 0 || currentX > maxX)
         {
-            ball.Velocity.X *= -1;
+            if (currentX < 0)
+            {
+                currentX = -currentX;
+                vx = Math.Abs(vx);
+            }
+
+            if (currentX > maxX)
+            {
+                currentX = 2 * maxX - currentX;
+                vx = -Math.Abs(vx);
+            }
         }
 
-        if (nextY < 0 || nextY + ball.Radius > _board.Height)
+        while (currentY < 0 || currentY > maxY)
         {
-            ball.Velocity.Y *= -1;
+            if (currentY < 0)
+            {
+                currentY = -currentY;
+                vy = Math.Abs(vy);
+            }
+
+            if (currentY > maxY)
+            {
+                currentY = 2 * maxY - currentY;
+                vy = -Math.Abs(vy);
+            }
         }
+
+        ball.Velocity.X = vx;
+        ball.Velocity.Y = vy;
+        ball.Position.Update(currentX, currentY);
     }
 }
