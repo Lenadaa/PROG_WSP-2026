@@ -11,7 +11,8 @@ public interface IBall : INotifyPropertyChanged
     /** @brief Current postion of the ball in 2D*/
     Vector Position { get; }
     /** @brief Current velocity vector of the ball*/
-    Vector Velocity { get; }
+    Vector Velocity { get; set; }
+
     /* @brief Current radius of the ball*/
     double Radius { get; }
     /* @brief Mass of the ball*/
@@ -30,7 +31,7 @@ internal class Ball : IBall
     private bool _isMoving = false;
     public event PropertyChangedEventHandler? PropertyChanged;
     public Vector Position { get; }
-    public Vector Velocity { get; }
+    public Vector Velocity { get; set; }
     public double Radius { get; } = 10;
     public double Diameter => Radius * 2;
     public double Mass { get; }

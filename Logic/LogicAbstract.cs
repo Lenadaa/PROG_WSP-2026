@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Security;
 using Data;
 
@@ -27,11 +28,15 @@ public abstract class LogicAbstract
 
 internal class LogicLayerImplementation : LogicAbstract
 {
-    private readonly DataAbstract _data;
-    private Board? _board; 
-    private bool _isSimulationRunning = false;
+private readonly DataAbstract _data;
+    private Board? _board;
+    
+    private volatile bool _isRunning = false; 
+    private Thread? _collisionThread;
     private readonly object _collisionLock = new object();
-
+    private const int TargetUpdatesPerSecond = 100;
+    private const int TargetMsPerFrame = 1000 / TargetUpdatesPerSecond;
+    
     public LogicLayerImplementation(DataAbstract data)
     {
         _data = data;
@@ -40,18 +45,63 @@ internal class LogicLayerImplementation : LogicAbstract
     public override void CreateScene(int ballCount, double width, double height)
     {
         _board = new Board(width, height);
-    
         _data.CreateBalls(ballCount, width, height);
-        var generatedBalls = _data.GetBalls();
-        _board.AddBalls(generatedBalls);
+        _board.AddBalls(_data.GetBalls());
 
         foreach (var ball in _board.Balls)
         {
             ball.Start();
         }
-        
-        _isSimulationRunning = true;
-        Task.Run(CollisionMonitor);
+
+        _isRunning = true;
+        _collisionThread = new Thread(CollisionLoop);
+        _collisionThread.IsBackground = true; 
+        _collisionThread.Start();
+    }
+
+    private void CollisionLoop()
+    {
+        Stopwatch stopwatch = new Stopwatch();
+        try
+        {
+            while (_isRunning)
+            {
+                stopwatch.Restart(); 
+                if (_board != null)
+                {
+                    lock (_collisionLock)
+                    {
+                        PerformPhysicsCycle();
+                    }
+                }
+
+                stopwatch.Stop(); 
+
+                int executionTime = (int)stopwatch.ElapsedMilliseconds;
+                int sleepTime = TargetMsPerFrame - executionTime;
+
+                if (sleepTime > 0)
+                {
+                    Thread.Sleep(sleepTime);
+                }
+            }
+        }
+        catch (ThreadInterruptedException)
+        {
+            throw new Exception("Collision loop interrupted");
+        }
+    }
+    private void PerformPhysicsCycle()
+    {
+        var balls = _board!.Balls;
+        for (int i = 0; i < balls.Count; i++)
+        {
+            for (int j = i + 1; j < balls.Count; j++)
+            {
+                CheckBallCollision(balls[i], balls[j]);
+            }
+            CheckBoundaryCollision(balls[i]);
+        }
     }
 
     public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
@@ -60,37 +110,6 @@ internal class LogicLayerImplementation : LogicAbstract
     {
         
     }
-
-    private async Task CollisionMonitor()
-    {
-        while (_isSimulationRunning)
-        {
-            if (_board != null)
-            {
-                var balls = _board.Balls;
-
-                lock (_collisionLock)
-                {
-                    for (int i = 0; i < balls.Count; i++)
-                    {
-                        var ball = balls[i];
-                        for (int j = i + 1; j < balls.Count; j++)
-                        {
-                            var otherBall = balls[j];
-                            CheckBallCollision(ball, otherBall);
-                        }
-                    }
-
-                    foreach (var ball in balls)
-                    {
-                        CheckBoundaryCollision(ball);
-                    }
-                }
-            }
-            await Task.Delay(10);
-        }
-    }
-
     private void CheckBoundaryCollision(IBall ball)
     {
         if (_board == null) return;
