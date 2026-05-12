@@ -15,14 +15,14 @@
     <Border Padding="35">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="320"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <ItemsControl Grid.Row="0" ItemsSource="{Binding Balls}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Name="Canvas" Width="700" Height="300" Background="#363E6E"/>
+                        <Canvas Name="Canvas" SizeChanged="SizeChanged" Background="#363E6E"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
@@ -35,8 +35,8 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Height="{Binding Radius}" 
-                                 Width="{Binding Radius}" 
+                        <Ellipse Height="{Binding Diameter}" 
+                                 Width="{Binding Diameter}" 
                                  Fill="#6276F6"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

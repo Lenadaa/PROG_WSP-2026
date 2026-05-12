@@ -10,7 +10,8 @@ internal class DataStub : DataAbstract
     {
         for (int i = 0; i < count; i++)
         {
-            TestBalls.Add(new Ball(maxX, maxY));
+            var ball = new Ball(maxX, maxY);
+            TestBalls.Add(ball);
         }
     }
     
@@ -24,14 +25,15 @@ public sealed class LogicTests
     {
         var stub = new DataStub();
         var ball = new Ball(100, 100); 
+        
         ball.Position.X = 1; 
         ball.Velocity.X = -2; 
         stub.TestBalls.Add(ball);
 
         var logic = LogicAbstract.CreateAPI(stub);
-        logic.CreateScene(1, 100, 100); 
+        logic.CreateScene(1, 100, 100);
 
-        logic.UpdateTheState();
+        ball.Move();
 
         Assert.IsTrue(ball.Velocity.X > 0);
     }
@@ -48,7 +50,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTheState();
+        ball.Move();
 
         Assert.IsTrue(ball.Velocity.X < 0);
     }
@@ -73,9 +75,9 @@ public sealed class LogicTests
         stub.TestBalls.Add(ball);
 
         var logic = LogicAbstract.CreateAPI(stub);
-        logic.CreateScene(1, 100, 100); 
+        logic.CreateScene(1, 100, 100);
 
-        logic.UpdateTheState();
+        ball.Move();
 
         Assert.IsTrue(ball.Velocity.Y > 0);
     }
@@ -93,7 +95,7 @@ public sealed class LogicTests
         var logic = LogicAbstract.CreateAPI(stub);
         logic.CreateScene(1, 100, 100); 
 
-        logic.UpdateTheState();
+        ball.Move();
 
         Assert.IsTrue(ball.Velocity.Y < 0);
     }

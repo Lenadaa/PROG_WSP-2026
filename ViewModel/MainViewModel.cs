@@ -23,8 +23,21 @@ public abstract class ViewModelBase : INotifyPropertyChanged
 public class MainViewModel : ViewModelBase
 {
     private readonly ModelAbstract _model;
-    private bool _isMoving; 
     private int _ballCount;
+    private double _width;
+    private double _height;
+
+    public double Width
+    {
+        get => _width;
+        set { _width = value; OnPropertyChanged(); }
+    }
+
+    public double Height
+    {
+        get => _height;
+        set { _height = value; OnPropertyChanged(); }
+    }
 
     public ObservableCollection<IBall> Balls { get; } = new();
 
@@ -46,35 +59,18 @@ public class MainViewModel : ViewModelBase
 
     private void StartSimulation()
     {
-        if (_isMoving)
-        {
-            _isMoving = false;
-            Balls.Clear();
-        }; 
-
-        _model.Start(BallCount, 700, 300); 
-        
         Balls.Clear();
+
+        _model.Start(BallCount, Width, Height); 
+        
         foreach (var ball in _model.GetBalls()) 
         {
             Balls.Add(ball);
         }
-
-        _isMoving = true;
-        Task.Run(SimulationLoop);
     }
 
     private void StopSimulation()
     {
-        _isMoving = false;
-    }
-
-    private async Task SimulationLoop()
-    {
-        while (_isMoving)
-        {
-            _model.UpdateTheState(); 
-            await Task.Delay(16);
-        }
+        Balls.Clear();
     }
 }

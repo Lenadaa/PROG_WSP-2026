@@ -9,6 +9,7 @@ public sealed class BallMovement
     public void CheckIfBallMoveNotifes()
     {
         var ball = new Ball(100, 100);
+        
         bool receivedNotification = false;
 
         ball.PropertyChanged += (s, e) => {

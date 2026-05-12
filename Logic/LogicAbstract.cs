@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Security;
 using Data;
 
 namespace Logic;
@@ -28,6 +29,8 @@ internal class LogicLayerImplementation : LogicAbstract
 {
     private readonly DataAbstract _data;
     private Board? _board; 
+    private bool _isSimulationRunning = false;
+    private readonly object _collisionLock = new object();
 
     public LogicLayerImplementation(DataAbstract data)
     {
@@ -40,65 +43,109 @@ internal class LogicLayerImplementation : LogicAbstract
     
         _data.CreateBalls(ballCount, width, height);
         var generatedBalls = _data.GetBalls();
-        _board.AddBalls(generatedBalls); 
+        _board.AddBalls(generatedBalls);
+
+        foreach (var ball in _board.Balls)
+        {
+            ball.Start();
+        }
+        
+        _isSimulationRunning = true;
+        Task.Run(CollisionMonitor);
     }
 
     public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
 
     public override void UpdateTheState()
     {
-        if (_board == null) return;
+        
+    }
 
-        foreach (var ball in _board.Balls)
+    private async Task CollisionMonitor()
+    {
+        while (_isSimulationRunning)
         {
-            ball.Move();
-            BoundaryCol(ball);
+            if (_board != null)
+            {
+                var balls = _board.Balls;
+
+                lock (_collisionLock)
+                {
+                    for (int i = 0; i < balls.Count; i++)
+                    {
+                        var ball = balls[i];
+                        for (int j = i + 1; j < balls.Count; j++)
+                        {
+                            var otherBall = balls[j];
+                            CheckBallCollision(ball, otherBall);
+                        }
+                    }
+
+                    foreach (var ball in balls)
+                    {
+                        CheckBoundaryCollision(ball);
+                    }
+                }
+            }
+            await Task.Delay(10);
         }
     }
 
-    private void BoundaryCol(IBall ball)
+    private void CheckBoundaryCollision(IBall ball)
     {
         if (_board == null) return;
-
-        double currentX = ball.Position.X;
-        double currentY = ball.Position.Y;
-        double vx = ball.Velocity.X;
-        double vy = ball.Velocity.Y;
-        double maxX = _board.Width - ball.Radius;
-        double maxY = _board.Height - ball.Radius;
-
-        while (currentX < 0 || currentX > maxX)
+        
+        if (ball.Position.X <= 0)
         {
-            if (currentX < 0)
-            {
-                currentX = -currentX;
-                vx = Math.Abs(vx);
-            }
-
-            if (currentX > maxX)
-            {
-                currentX = 2 * maxX - currentX;
-                vx = -Math.Abs(vx);
-            }
+            ball.Position.X = 0;
+            ball.Velocity.X = Math.Abs(ball.Velocity.X);
         }
-
-        while (currentY < 0 || currentY > maxY)
+        else if (ball.Position.X + ball.Diameter >= _board.Width)
         {
-            if (currentY < 0)
-            {
-                currentY = -currentY;
-                vy = Math.Abs(vy);
-            }
-
-            if (currentY > maxY)
-            {
-                currentY = 2 * maxY - currentY;
-                vy = -Math.Abs(vy);
-            }
+            ball.Position.X = _board.Width - ball.Diameter;
+            ball.Velocity.X = -Math.Abs(ball.Velocity.X);
         }
+        if (ball.Position.Y <= 0)
+        {
+            ball.Position.Y = 0;
+            ball.Velocity.Y = Math.Abs(ball.Velocity.Y);
+        }
+        else if (ball.Position.Y + ball.Diameter >= _board.Height)
+        {
+            ball.Position.Y = _board.Height - ball.Diameter;
+            ball.Velocity.Y = -Math.Abs(ball.Velocity.Y);
+        }
+    }
 
-        ball.Velocity.X = vx;
-        ball.Velocity.Y = vy;
-        ball.Position.Update(currentX, currentY);
+    private void CheckBallCollision(IBall ball, IBall otherBall)
+    {
+        double dx = ball.Position.X - otherBall.Position.X;
+        double dy = ball.Position.Y - otherBall.Position.Y;
+        double distance = Math.Sqrt(dx * dx + dy * dy);
+        
+        if (distance <= ball.Radius + otherBall.Radius)
+        {
+            double nx = dx / distance;
+            double ny = dy / distance;
+            
+            double dvx = ball.Velocity.X - otherBall.Velocity.X;
+            double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
+            
+            double speed = dvx * nx + dvy * ny;
+
+            if (speed > 0) return;
+            
+            double impulse = -2 * speed;
+            impulse /= (1 / ball.Mass + 1 / otherBall.Mass);
+            
+            double impulseX = impulse * nx;
+            double impulseY = impulse * ny;
+            
+            ball.Velocity.X += impulseX / ball.Mass;
+            ball.Velocity.Y += impulseY / ball.Mass;
+            
+            otherBall.Velocity.X -= impulseX / otherBall.Mass;
+            otherBall.Velocity.Y -= impulseY / otherBall.Mass;
+        }
     }
 }

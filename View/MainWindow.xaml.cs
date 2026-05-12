@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ViewModel;
 
 namespace View;
 
@@ -19,5 +20,14 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+    
+    private void SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.Width = e.NewSize.Width;
+            viewModel.Height = e.NewSize.Height;
+        }
     }
 }
