@@ -26,6 +26,8 @@ public class MainViewModel : ViewModelBase
     private int _ballCount;
     private double _width;
     private double _height;
+    
+    
 
     public double Width
     {
