@@ -43,6 +43,7 @@ internal class Ball : IBall
         public Ball(double maxX, double maxY)
         {
             Mass = GenerateRandom(10, 20);
+            Radius = Mass;
             Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
             Velocity = new Vector(GenerateRandom(-2, 2), GenerateRandom(-2, 2));
             Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
