@@ -94,13 +94,20 @@ private readonly DataAbstract _data;
     private void PerformPhysicsCycle()
     {
         var balls = _board!.Balls;
+
+        foreach (var ball in balls)
+        {
+            ball.Move();
+        }
+
         for (int i = 0; i < balls.Count; i++)
         {
+            CheckBoundaryCollision(balls[i]);
+
             for (int j = i + 1; j < balls.Count; j++)
             {
                 CheckBallCollision(balls[i], balls[j]);
             }
-            CheckBoundaryCollision(balls[i]);
         }
     }
 
@@ -113,26 +120,54 @@ private readonly DataAbstract _data;
     private void CheckBoundaryCollision(IBall ball)
     {
         if (_board == null) return;
-        
-        if (ball.Position.X <= 0)
+
+        double maxX = _board.Width - ball.Diameter;
+        double maxY = _board.Height - ball.Diameter;
+
+        double x = ball.Position.X;
+        double y = ball.Position.Y;
+        double vx = ball.Velocity.X;
+        double vy = ball.Velocity.Y;
+
+        bool collided = false;
+
+
+        while (x < 0 || x > maxX)
         {
-            ball.Position.X = 0;
-            ball.Velocity.X = Math.Abs(ball.Velocity.X);
+            if (x < 0)
+            {
+                x = -x;      
+                vx = Math.Abs(vx); 
+            }
+            else if (x > maxX)
+            {
+                x = 2 * maxX - x; 
+                vx = -Math.Abs(vx);
+            }
+            collided = true;
         }
-        else if (ball.Position.X + ball.Diameter >= _board.Width)
+
+        while (y < 0 || y > maxY)
         {
-            ball.Position.X = _board.Width - ball.Diameter;
-            ball.Velocity.X = -Math.Abs(ball.Velocity.X);
+            if (y < 0)
+            {
+                y = -y;      
+                vy = Math.Abs(vy);
+            }
+            else if (y > maxY)
+            {
+                y = 2 * maxY - y; 
+                vy = -Math.Abs(vy);
+            }
+            collided = true;
         }
-        if (ball.Position.Y <= 0)
+
+        if (collided)
         {
-            ball.Position.Y = 0;
-            ball.Velocity.Y = Math.Abs(ball.Velocity.Y);
-        }
-        else if (ball.Position.Y + ball.Diameter >= _board.Height)
-        {
-            ball.Position.Y = _board.Height - ball.Diameter;
-            ball.Velocity.Y = -Math.Abs(ball.Velocity.Y);
+            ball.Position.X = x;
+            ball.Position.Y = y;
+            ball.Velocity.X = vx;
+            ball.Velocity.Y = vy;
         }
     }
 
@@ -141,30 +176,50 @@ private readonly DataAbstract _data;
         double dx = ball.Position.X - otherBall.Position.X;
         double dy = ball.Position.Y - otherBall.Position.Y;
         double distance = Math.Sqrt(dx * dx + dy * dy);
-        
-        if (distance <= ball.Radius + otherBall.Radius)
-        {
-            double nx = dx / distance;
-            double ny = dy / distance;
-            
-            double dvx = ball.Velocity.X - otherBall.Velocity.X;
-            double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
-            
-            double speed = dvx * nx + dvy * ny;
+        double minDistance = ball.Radius + otherBall.Radius;
 
-            if (speed > 0) return;
-            
-            double impulse = -2 * speed;
-            impulse /= (1 / ball.Mass + 1 / otherBall.Mass);
-            
-            double impulseX = impulse * nx;
-            double impulseY = impulse * ny;
-            
-            ball.Velocity.X += impulseX / ball.Mass;
-            ball.Velocity.Y += impulseY / ball.Mass;
-            
-            otherBall.Velocity.X -= impulseX / otherBall.Mass;
-            otherBall.Velocity.Y -= impulseY / otherBall.Mass;
+        if (distance <= minDistance)
+        {
+            if (distance > 0)
+            {
+                double overlap = minDistance - distance;
+                double nx = dx / distance;
+                double ny = dy / distance;
+
+                double totalMass = ball.Mass + otherBall.Mass;
+                double ratio1 = otherBall.Mass / totalMass;
+                double ratio2 = ball.Mass / totalMass;
+
+                ball.Position.X += nx * overlap * ratio1;
+                ball.Position.Y += ny * overlap * ratio1;
+                otherBall.Position.X -= nx * overlap * ratio2;
+                otherBall.Position.Y -= ny * overlap * ratio2;
+
+                dx = ball.Position.X - otherBall.Position.X;
+                dy = ball.Position.Y - otherBall.Position.Y;
+                distance = Math.Sqrt(dx * dx + dy * dy);
+                nx = dx / distance;
+                ny = dy / distance;
+
+                double dvx = ball.Velocity.X - otherBall.Velocity.X;
+                double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
+
+                double speed = dvx * nx + dvy * ny;
+
+                if (speed > 0) return;
+
+                double impulse = -2 * speed;
+                impulse /= (1 / ball.Mass + 1 / otherBall.Mass);
+
+                double impulseX = impulse * nx;
+                double impulseY = impulse * ny;
+
+                ball.Velocity.X += impulseX / ball.Mass;
+                ball.Velocity.Y += impulseY / ball.Mass;
+
+                otherBall.Velocity.X -= impulseX / otherBall.Mass;
+                otherBall.Velocity.Y -= impulseY / otherBall.Mass;
+            }
         }
     }
 }

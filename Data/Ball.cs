@@ -28,10 +28,8 @@ internal class Ball : IBall
     {
         private static readonly Random _random = new();
         private readonly object _lock = new object();
-        
+
         private volatile bool _isMoving = false;
-        
-        private Thread? _movementThread;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public Vector Position { get; }
@@ -45,35 +43,18 @@ internal class Ball : IBall
             Mass = GenerateRandom(10, 20);
             Radius = Mass;
             Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
-            Velocity = new Vector(GenerateRandom(-2, 2), GenerateRandom(-2, 2));
+            Velocity = new Vector(GenerateRandom(-2,2),GenerateRandom(-2,2));
             Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
         }
 
         public void Start()
         {
-            if (_isMoving) return;
-
             _isMoving = true;
-            _movementThread = new Thread(MovementLoop)
-            {
-                IsBackground = true,
-                Name = "BallMovementThread"
-            };
-            _movementThread.Start();
         }
 
         public void Stop()
         {
             _isMoving = false;
-        }
-
-        private void MovementLoop()
-        {
-            while (_isMoving)
-            {
-                Move();
-                Thread.Sleep(10); 
-            }
         }
 
         public void Move()

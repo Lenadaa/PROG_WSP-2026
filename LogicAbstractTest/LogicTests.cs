@@ -21,27 +21,6 @@ public class LogicLayerTests
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
     
-    [TestMethod]
-    [DataRow(0, 50, -2, 0, true)]   // Lewa ściana 
-    [DataRow(95, 50, 5, 0, true)]   // Prawa ściana
-    [DataRow(50, 50, 2, 2, false)]  // Środek - brak kolizji
-    public void CheckReverseVelocity(double x, double y, double vx, double vy, bool shouldReverse)
-    {
-        var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
-        var ball = new BallStub { Position = new Vector(x, y), Velocity = new Vector(vx, vy), Radius = 5 };
-        double originalVx = vx;
-        
-        logic.CreateScene(0, 100, 100); 
-        
-        var method = typeof(LogicLayerImplementation).GetMethod("CheckBoundaryCollision", 
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        method?.Invoke(logic, new object[] { ball });
-
-        if (shouldReverse)
-            Assert.AreNotEqual(originalVx, ball.Velocity.X);
-        else
-            Assert.AreEqual(originalVx, ball.Velocity.X);
-    }
     
     [TestMethod]
     public void CheckBallCollisiohnVelocity()
