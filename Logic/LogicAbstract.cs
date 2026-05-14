@@ -42,22 +42,34 @@ private readonly DataAbstract _data;
         _data = data;
     }
 
+    public void StopSimulation()
+    {
+        _isRunning = false;
+        _barrier?.Dispose();
+    }
     public override void CreateScene(int ballCount, double width, double height)
     {
+        _isRunning = false;
+
+        if (_barrier != null)
+        {
+
+            _barrier.Dispose();
+        }
+
         _board = new Board(width, height);
         _data.CreateBalls(ballCount, width, height);
-        var ballsFromData = _data.GetBalls();
-        _board.AddBalls(ballsFromData);
-        _isRunning = true;
-        Debug.WriteLine($"Tworzę scenę: {ballsFromData.Count} kulek.");
-        _barrier = new Barrier(ballCount, (b) =>
+        _board.AddBalls(_data.GetBalls());
+
+        _barrier = new Barrier(_board.Balls.Count, (b) =>
         {
             PerformCollisionChecks();
         });
 
+        _isRunning = true;
+        
         foreach (var ball in _board.Balls)
         {
-
             Thread t = new Thread(() => BallThreadLoop(ball));
             t.IsBackground = true;
             t.Start();
@@ -66,12 +78,37 @@ private readonly DataAbstract _data;
 
     private void BallThreadLoop(IBall ball)
     {
-        while (_isRunning)
+        try
         {
-            ball.Move();
-            CheckBoundaryCollision(ball); 
-            _barrier.SignalAndWait();
-            Thread.Sleep(TargetMsPerFrame);
+            while (_isRunning)
+            {
+                ball.Move();
+                CheckBoundaryCollision(ball);
+
+                if (_barrier != null && _isRunning)
+                {
+                    _barrier.SignalAndWait();
+                }
+
+                Thread.Sleep(TargetMsPerFrame);
+            }
+        }
+        catch (Exception ex) when (ex is ObjectDisposedException || ex is BarrierPostPhaseException)
+        {
+            Debug.WriteLine("Wątek kulki zakończył pracę poprawnie (sprzątanie).");
+        }
+        catch (InvalidOperationException)
+        {
+            Debug.WriteLine("Wykryto stary wątek - kończenie.");
+        }
+    }
+    private void StopAndCleanup()
+    {
+        _isRunning = false;
+        if (_barrier != null)
+        {
+            _barrier.Dispose(); 
+            _barrier = null;
         }
     }
     
@@ -88,7 +125,7 @@ private readonly DataAbstract _data;
     }
 
     public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
-
+    
     public override void UpdateTheState()
     {
         
