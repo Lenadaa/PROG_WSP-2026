@@ -30,10 +30,10 @@ internal class LogicLayerImplementation : LogicAbstract
 {
 private readonly DataAbstract _data;
     private Board? _board;
+    private Barrier _barrier;
     
     private volatile bool _isRunning = false; 
     private Thread? _collisionThread;
-    private readonly object _collisionLock = new object();
     private const int TargetUpdatesPerSecond = 100;
     private const int TargetMsPerFrame = 1000 / TargetUpdatesPerSecond;
     
@@ -46,64 +46,40 @@ private readonly DataAbstract _data;
     {
         _board = new Board(width, height);
         _data.CreateBalls(ballCount, width, height);
-        _board.AddBalls(_data.GetBalls());
+        var ballsFromData = _data.GetBalls();
+        _board.AddBalls(ballsFromData);
+        _isRunning = true;
+        Debug.WriteLine($"Tworzę scenę: {ballsFromData.Count} kulek.");
+        _barrier = new Barrier(ballCount, (b) =>
+        {
+            PerformCollisionChecks();
+        });
 
         foreach (var ball in _board.Balls)
         {
-            ball.Start();
-        }
 
-        _isRunning = true;
-        _collisionThread = new Thread(CollisionLoop);
-        _collisionThread.IsBackground = true; 
-        _collisionThread.Start();
-    }
-
-    private void CollisionLoop()
-    {
-        Stopwatch stopwatch = new Stopwatch();
-        try
-        {
-            while (_isRunning)
-            {
-                stopwatch.Restart(); 
-                if (_board != null)
-                {
-                    lock (_collisionLock)
-                    {
-                        PerformPhysicsCycle();
-                    }
-                }
-
-                stopwatch.Stop(); 
-
-                int executionTime = (int)stopwatch.ElapsedMilliseconds;
-                int sleepTime = TargetMsPerFrame - executionTime;
-
-                if (sleepTime > 0)
-                {
-                    Thread.Sleep(sleepTime);
-                }
-            }
-        }
-        catch (ThreadInterruptedException)
-        {
-            throw new Exception("Collision loop interrupted");
+            Thread t = new Thread(() => BallThreadLoop(ball));
+            t.IsBackground = true;
+            t.Start();
         }
     }
-    private void PerformPhysicsCycle()
-    {
-        var balls = _board!.Balls;
 
-        foreach (var ball in balls)
+    private void BallThreadLoop(IBall ball)
+    {
+        while (_isRunning)
         {
             ball.Move();
+            CheckBoundaryCollision(ball); 
+            _barrier.SignalAndWait();
+            Thread.Sleep(TargetMsPerFrame);
         }
-
+    }
+    
+    private void PerformCollisionChecks()
+    {
+        var balls = _board.Balls;
         for (int i = 0; i < balls.Count; i++)
         {
-            CheckBoundaryCollision(balls[i]);
-
             for (int j = i + 1; j < balls.Count; j++)
             {
                 CheckBallCollision(balls[i], balls[j]);

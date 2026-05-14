@@ -1,8 +1,9 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Data;
+
 /// <summary>
 /// @brief Interface for a ball.
 /// </summary>
@@ -10,26 +11,27 @@ public interface IBall : INotifyPropertyChanged
 {
     /** @brief Current postion of the ball in 2D*/
     Vector Position { get; }
+
     /** @brief Current velocity vector of the ball*/
     Vector Velocity { get; set; }
 
     /* @brief Current radius of the ball*/
     double Radius { get; }
+
     /* @brief Mass of the ball*/
-    double Mass { get;  }
+    double Mass { get; }
+
     /* @brief Diameter of the ball */
     double Diameter { get; }
+
     /* @brief Updates the position of the ball based on velocity */
     void Move();
-    void Start();
-    void Stop();
 }
+
 internal class Ball : IBall
     {
-        private static readonly Random _random = new();
-        private readonly object _lock = new object();
-
-        private volatile bool _isMoving = false;
+        private readonly Random _random = new();
+        private volatile bool _isMoving;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public Vector Position { get; }
@@ -47,24 +49,11 @@ internal class Ball : IBall
             Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
         }
 
-        public void Start()
-        {
-            _isMoving = true;
-        }
-
-        public void Stop()
-        {
-            _isMoving = false;
-        }
-
         public void Move()
         { 
-            lock (_lock)
-            {
-                double newX = Position.X + Velocity.X;
-                double newY = Position.Y + Velocity.Y;
-                Position.Update(newX, newY);
-            }
+            double newX = Position.X + Velocity.X;
+            double newY = Position.Y + Velocity.Y;
+            Position.Update(newX, newY);
         }
 
         private double GenerateRandom(double min, double max)
