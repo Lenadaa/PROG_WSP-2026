@@ -20,6 +20,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        ToolTipService.SetInitialShowDelay(this, 100);
+        ToolTipService.SetShowDuration(this, 10000);
     }
     
     private void SizeChanged(object sender, SizeChangedEventArgs e)

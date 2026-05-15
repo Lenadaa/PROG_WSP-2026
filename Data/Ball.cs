@@ -26,6 +26,8 @@ public interface IBall : INotifyPropertyChanged
 
     /* @brief Updates the position of the ball based on velocity */
     void Move();
+    
+    void Start();
 }
 
 internal class Ball : IBall
@@ -34,11 +36,12 @@ internal class Ball : IBall
         private volatile bool _isMoving;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public Vector Position { get; }
+        public Vector Position { get; set; }
         public Vector Velocity { get; set; }
         public double Radius { get; } = 10;
         public double Diameter => Radius * 2;
-        public double Mass { get; }
+        public double Mass { get; set; }
+        private Thread? _thread;
 
         public Ball(double maxX, double maxY)
         {
@@ -47,8 +50,36 @@ internal class Ball : IBall
             Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
             Velocity = new Vector(GenerateRandom(-2,2),GenerateRandom(-2,2));
             Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
+            _isMoving = true;
+            _thread = new Thread(() =>
+            {
+                Debug.WriteLine("Thread" + Thread.CurrentThread.ManagedThreadId);
+                try
+                {
+                    while (_isMoving)
+                    {
+                        Move();
+                        Thread.Sleep(10);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+                finally
+                {
+                    if (_thread != null)
+                    {
+                        Debug.WriteLine("Thread finished");
+                    }
+                }
+            });
         }
 
+        public void Start()
+        {
+            _thread?.Start();
+        }
         public void Move()
         { 
             double newX = Position.X + Velocity.X;
@@ -65,4 +96,9 @@ internal class Ball : IBall
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-}
+
+        public override string ToString()
+        {
+            return "[Ball]- Postion" + Position.ToString() + "Velocity" + Velocity.ToString() + "Mass: " + Mass;
+        }
+    }

@@ -22,7 +22,10 @@
             <ItemsControl Grid.Row="0" ItemsSource="{Binding Balls}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Name="Canvas" SizeChanged="SizeChanged" Background="#363E6E"/>
+                        <Canvas Name="Canvas" SizeChanged="SizeChanged"
+                                Height="300"
+                                Width="700"
+                                Background="#363E6E"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
@@ -35,9 +38,22 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Height="{Binding Diameter}" 
-                                 Width="{Binding Diameter}" 
-                                 Fill="#6276F6"/>
+                        <Ellipse Width="{Binding Diameter}" 
+                                 Height="{Binding Diameter}" 
+                                 Fill="CornflowerBlue"
+                                 Stroke="Black"
+                                 >
+                            <!-- <Ellipse.ToolTip> -->
+                            <!--     <ToolTip> -->
+                            <!--         <StackPanel> -->
+                            <!--             <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontWeight="Bold"/> -->
+                            <!--             <TextBlock Text="{Binding Mass, StringFormat='Masa: {0:F2}'}"/> -->
+                            <!--             <TextBlock Text="{Binding Velocity.X, StringFormat='VX: {0:F2}'}"/> -->
+                            <!--             <TextBlock Text="{Binding Velocity.Y, StringFormat='VY: {0:F2}'}"/> -->
+                            <!--         </StackPanel> -->
+                            <!--     </ToolTip> -->
+                            <!-- </Ellipse.ToolTip> -->
+                        </Ellipse>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -52,6 +68,7 @@
                         FontWeight="Bold"
                         Background="#310dc4"
                         Foreground="White"
+                        
                         Command="{Binding StartSimulationCommand}">
                 </Button>
     

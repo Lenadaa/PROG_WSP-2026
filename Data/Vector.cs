@@ -48,4 +48,6 @@ public class Vector : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    
+    override public string ToString() => $"[{X}, {Y}]";
 }

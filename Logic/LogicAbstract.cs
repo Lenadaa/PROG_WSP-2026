@@ -30,96 +30,77 @@ internal class LogicLayerImplementation : LogicAbstract
 {
 private readonly DataAbstract _data;
     private Board? _board;
-    private Barrier _barrier;
     
     private volatile bool _isRunning = false; 
     private Thread? _collisionThread;
-    private const int TargetUpdatesPerSecond = 100;
-    private const int TargetMsPerFrame = 1000 / TargetUpdatesPerSecond;
+    private Thread? _mainThread;
+    private readonly Stopwatch stopWatch = new();
     
     public LogicLayerImplementation(DataAbstract data)
     {
         _data = data;
     }
-
-    public void StopSimulation()
-    {
-        _isRunning = false;
-        _barrier?.Dispose();
-    }
     public override void CreateScene(int ballCount, double width, double height)
     {
-        _isRunning = false;
-
-        if (_barrier != null)
-        {
-
-            _barrier.Dispose();
-        }
-
         _board = new Board(width, height);
         _data.CreateBalls(ballCount, width, height);
         _board.AddBalls(_data.GetBalls());
-
-        _barrier = new Barrier(_board.Balls.Count, (b) =>
-        {
-            PerformCollisionChecks();
-        });
-
         _isRunning = true;
-        
         foreach (var ball in _board.Balls)
         {
-            Thread t = new Thread(() => BallThreadLoop(ball));
-            t.IsBackground = true;
-            t.Start();
+            ball.Start();
         }
-    }
-
-    private void BallThreadLoop(IBall ball)
-    {
-        try
+        _mainThread = new Thread(() =>
         {
-            while (_isRunning)
+            try
             {
-                ball.Move();
-                CheckBoundaryCollision(ball);
-
-                if (_barrier != null && _isRunning)
+                while (_isRunning)
                 {
-                    _barrier.SignalAndWait();
+                    CheckCollisions();
+                    int timeToWait = 10 - (int)stopWatch.ElapsedMilliseconds;
+                    if (timeToWait > 0)
+                    {
+                        Thread.Sleep(timeToWait);
+                    }
                 }
-
-                Thread.Sleep(TargetMsPerFrame);
             }
-        }
-        catch (Exception ex) when (ex is ObjectDisposedException || ex is BarrierPostPhaseException)
-        {
-            Debug.WriteLine("Wątek kulki zakończył pracę poprawnie (sprzątanie).");
-        }
-        catch (InvalidOperationException)
-        {
-            Debug.WriteLine("Wykryto stary wątek - kończenie.");
-        }
-    }
-    private void StopAndCleanup()
-    {
-        _isRunning = false;
-        if (_barrier != null)
-        {
-            _barrier.Dispose(); 
-            _barrier = null;
-        }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        });
+        _mainThread.IsBackground = true;
+        _mainThread.Start();
     }
     
-    private void PerformCollisionChecks()
+    private void CheckCollisions()
     {
-        var balls = _board.Balls;
+        var balls = GetBalls();
         for (int i = 0; i < balls.Count; i++)
         {
-            for (int j = i + 1; j < balls.Count; j++)
+            IBall ball1 = balls[i];
+            CheckBoundaryCollision(ball1);
+
+            for (int j = i + 1; j < balls.Count; j++) 
             {
-                CheckBallCollision(balls[i], balls[j]);
+                IBall ball2 = balls[j];
+            
+                double dx = ball1.Position.X - ball2.Position.X;
+                double dy = ball1.Position.Y - ball2.Position.Y;
+                double distance = Math.Sqrt(dx * dx + dy * dy);
+                var first = ball1.GetHashCode() < ball2.GetHashCode() ? ball1 : ball2;
+                var second = first == ball1 ? ball2 : ball1;
+                if (distance <= ball1.Radius + ball2.Radius)
+                {
+                    lock(first) 
+                    {
+                        lock(second)
+                        {
+                            CheckBallCollision(ball1, ball2);
+                        }
+                    }
+                }
             }
         }
     }
@@ -184,55 +165,52 @@ private readonly DataAbstract _data;
         }
     }
 
-    private void CheckBallCollision(IBall ball, IBall otherBall)
+private void CheckBallCollision(IBall ball, IBall otherBall)
+{
+    double dx = ball.Position.X - otherBall.Position.X;
+    double dy = ball.Position.Y - otherBall.Position.Y;
+    double distance = Math.Sqrt(dx * dx + dy * dy);
+    double minDistance = ball.Radius + otherBall.Radius;
+
+    if (distance <= minDistance && distance > 0)
     {
-        double dx = ball.Position.X - otherBall.Position.X;
-        double dy = ball.Position.Y - otherBall.Position.Y;
-        double distance = Math.Sqrt(dx * dx + dy * dy);
-        double minDistance = ball.Radius + otherBall.Radius;
+        double initialSpeed1 = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
+        double initialSpeed2 = Math.Sqrt(otherBall.Velocity.X * otherBall.Velocity.X + otherBall.Velocity.Y * otherBall.Velocity.Y);
 
-        if (distance <= minDistance)
-        {
-            if (distance > 0)
-            {
-                double overlap = minDistance - distance;
-                double nx = dx / distance;
-                double ny = dy / distance;
+        double overlap = minDistance - distance;
+        double nx = dx / distance;
+        double ny = dy / distance;
 
-                double totalMass = ball.Mass + otherBall.Mass;
-                double ratio1 = otherBall.Mass / totalMass;
-                double ratio2 = ball.Mass / totalMass;
+        double totalMass = ball.Mass + otherBall.Mass;
+        double ratio1 = otherBall.Mass / totalMass;
+        double ratio2 = ball.Mass / totalMass;
 
-                ball.Position.X += nx * overlap * ratio1;
-                ball.Position.Y += ny * overlap * ratio1;
-                otherBall.Position.X -= nx * overlap * ratio2;
-                otherBall.Position.Y -= ny * overlap * ratio2;
+        ball.Position.X += nx * overlap * ratio1;
+        ball.Position.Y += ny * overlap * ratio1;
+        otherBall.Position.X -= nx * overlap * ratio2;
+        otherBall.Position.Y -= ny * overlap * ratio2;
 
-                dx = ball.Position.X - otherBall.Position.X;
-                dy = ball.Position.Y - otherBall.Position.Y;
-                distance = Math.Sqrt(dx * dx + dy * dy);
-                nx = dx / distance;
-                ny = dy / distance;
+        double dvx = ball.Velocity.X - otherBall.Velocity.X;
+        double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
+        double speedNormal = dvx * nx + dvy * ny;
 
-                double dvx = ball.Velocity.X - otherBall.Velocity.X;
-                double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
+        if (speedNormal > 0) return; 
 
-                double speed = dvx * nx + dvy * ny;
+        double impulse = -2 * speedNormal / (1 / ball.Mass + 1 / otherBall.Mass);
 
-                if (speed > 0) return;
+        double newVx1 = ball.Velocity.X + (impulse * nx) / ball.Mass;
+        double newVy1 = ball.Velocity.Y + (impulse * ny) / ball.Mass;
+        double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
+        double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
 
-                double impulse = -2 * speed;
-                impulse /= (1 / ball.Mass + 1 / otherBall.Mass);
+        double currentSpeed1 = Math.Sqrt(newVx1 * newVx1 + newVy1 * newVy1);
+        double currentSpeed2 = Math.Sqrt(newVx2 * newVx2 + newVy2 * newVy2);
 
-                double impulseX = impulse * nx;
-                double impulseY = impulse * ny;
+        ball.Velocity.X = (newVx1 / currentSpeed1) * initialSpeed1;
+        ball.Velocity.Y = (newVy1 / currentSpeed1) * initialSpeed1;
 
-                ball.Velocity.X += impulseX / ball.Mass;
-                ball.Velocity.Y += impulseY / ball.Mass;
-
-                otherBall.Velocity.X -= impulseX / otherBall.Mass;
-                otherBall.Velocity.Y -= impulseY / otherBall.Mass;
-            }
-        }
+        otherBall.Velocity.X = (newVx2 / currentSpeed2) * initialSpeed2;
+        otherBall.Velocity.Y = (newVy2 / currentSpeed2) * initialSpeed2;
     }
+}
 }
