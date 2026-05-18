@@ -92,14 +92,8 @@ private readonly DataAbstract _data;
                 var first = ball1.GetHashCode() < ball2.GetHashCode() ? ball1 : ball2;
                 var second = first == ball1 ? ball2 : ball1;
                 if (distance <= ball1.Radius + ball2.Radius)
-                {
-                    lock(first) 
-                    {
-                        lock(second)
-                        {
-                            CheckBallCollision(ball1, ball2);
-                        }
-                    }
+                { 
+                    CheckBallCollision(ball1, ball2);
                 }
             }
         }

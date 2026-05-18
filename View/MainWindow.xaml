@@ -41,7 +41,6 @@
                         <Ellipse Width="{Binding Diameter}" 
                                  Height="{Binding Diameter}" 
                                  Fill="CornflowerBlue"
-                                 Stroke="Black"
                                  >
                             <!-- <Ellipse.ToolTip> -->
                             <!--     <ToolTip> -->
