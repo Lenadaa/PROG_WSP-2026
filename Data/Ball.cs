@@ -44,12 +44,10 @@ internal class Ball : IBall
         public event PropertyChangedEventHandler? PropertyChanged;
         public Vector Position { get; set; }
         public Vector Velocity { get; set; }
-        private static readonly SemaphoreSlim _eventSemaphore = new SemaphoreSlim(3, 3);
         public double Radius { get; } = 10;
         public double Diameter => Radius * 2;
         public double Mass { get; set; }
         private Thread? _thread;
-        private readonly object _lockObject;
         public object SyncRoot { get;  } = new object();
         private int _moveCount;
         public int MoveCount => Volatile.Read(ref _moveCount);
@@ -117,17 +115,8 @@ internal class Ball : IBall
 
         protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            _eventSemaphore.Wait();
-
-            try
-            {
-                PropertyChangedEventHandler? handler = PropertyChanged;
-                handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            finally
-            {
-                _eventSemaphore.Release();
-            }
+            PropertyChangedEventHandler? handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         public override string ToString()
         {

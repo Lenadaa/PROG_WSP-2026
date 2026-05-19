@@ -24,7 +24,7 @@ public class LogicLayerTests
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
     
-    
+    //Sprawdzenie, czy algorytm zderzenia kulka-kulka zmienia kierunki wektorów prędkości w logiczny sposób
     [TestMethod]
     public void CheckBallCollisiohnVelocity()
     {
@@ -45,6 +45,7 @@ public class LogicLayerTests
         Assert.IsGreaterThan(0, ball2.Velocity.X);
     }
     
+    //Upewnienie się, że powoływanie sceny z kulkami zachowuje płynność asynchroniczną i nie blokuje wywołującego wątku na zbyt długo.
     [TestMethod]
     public async Task StabilityTest()
     {
@@ -65,7 +66,7 @@ public class LogicLayerTests
         double timePassed = (endTime - startTime).TotalMilliseconds;
         Assert.IsGreaterThanOrEqualTo(sampleDurationMs * 0.8, timePassed);
     }
-
+    //Weryfikacja mechanizmu odbijania się kulki od krawędzi
     [TestMethod]
     public void WallCollisionTest()
     {
@@ -89,6 +90,7 @@ public class LogicLayerTests
         Assert.AreEqual(2, ball.Velocity.Y);
     }
 
+    //Dokładne, matematyczne sprawdzenie zderzenia sprężystego pomiędzy dwoma ciałami pod kątem zmian pozycji i prędkości.
     [TestMethod]
     public void ElasticCollisionTest()
     {
@@ -123,7 +125,7 @@ public class LogicLayerTests
         Assert.AreEqual(0, ball1.Velocity.Y);
         Assert.AreEqual(0, ball2.Velocity.Y);
     }
-    
+    //Weryfikacja synchronizacji przy dużym obciążeniu (100 kulek).
     [TestMethod]
     public async Task FairnessTest100Balls()
     {
@@ -148,5 +150,116 @@ public class LogicLayerTests
         {
             logic.Stop();
         }
+    }
+    //Sprawdzenie odporności warstwy danych na równoległy odczyt i modyfikację kolekcji kulek.
+    [TestMethod]
+    public async Task TestForReadAndWriteOfListOfBall()
+    {
+        var dataLayer = DataAbstract.CreateAPI(); 
+        dataLayer.CreateBalls(10, 100, 100); 
+    
+        bool keepRunning = true;
+        Exception? caughtException = null;
+        
+        Task readerTask = Task.Run(() =>
+        {
+            try
+            {
+                while (keepRunning)
+                {
+                    var balls = dataLayer.GetBalls(); 
+                    foreach (var ball in balls)
+                    {
+                        var pos = ball.Position; 
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                caughtException = ex; 
+            }
+        });
+
+        Task writerTask = Task.Run(() =>
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                dataLayer.CreateBalls(5, 500, 500); //
+                Thread.Sleep(1); 
+            }
+            keepRunning = false;
+        });
+        await Task.WhenAll(readerTask, writerTask);
+        Assert.IsNull(caughtException);
+    }
+    
+    //Testowanie integralności i spójności danych wektora pozycji podczas intensywnej modyfikacji wielowątkowej.
+    [TestMethod]
+    public async Task TestThreadSafeAgainstPositionReads()
+    {
+        var ball = new Ball(500, 500);
+        ball.Velocity = new Vector(5, 5); 
+    
+        bool keepRunning = true;
+        Exception? caughtException = null;
+        
+        Task writerTask = Task.Run(() =>
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                ball.Move(); //
+            }
+            keepRunning = false;
+        });
+
+        Task readerTask = Task.Run(() =>
+        {
+            try
+            {
+                while (keepRunning)
+                {
+
+                    lock (ball.SyncRoot)
+                    {
+                        var pos = ball.Position;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                caughtException = ex;
+            }
+        });
+        await Task.WhenAll(writerTask, readerTask);
+        Assert.IsNull(caughtException);
+    }
+    
+    //
+    [TestMethod]
+    public async Task TestHandleBarrierDisposal()
+    {
+        int ballCount = 3;
+        var dataLayer = DataAbstract.CreateAPI(); 
+        dataLayer.CreateBalls(ballCount, 300, 300); 
+        var balls = dataLayer.GetBalls(); 
+    
+        Barrier barrier = new Barrier(ballCount); 
+
+        foreach (var ball in balls)
+        {
+            ball.Start(barrier); 
+        }
+
+        await Task.Delay(100);
+
+        barrier.Dispose(); 
+
+        await Task.Delay(100);
+        
+        foreach (var ball in balls)
+        {
+            ball.Stop(); 
+        }
+        Assert.IsTrue(true);
     }
 }

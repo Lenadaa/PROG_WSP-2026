@@ -35,18 +35,25 @@ public abstract class DataAbstract
 internal class DataLayerImplementation : DataAbstract
 {
     private readonly List<IBall> _balls = new();
+    private readonly object _lockMatrix = new object();
 
     public override void CreateBalls(int count, double maxX, double maxY)
     {
-        _balls.Clear();
-        for (int i = 0; i < count; i++)
+        lock (_lockMatrix)
         {
-            _balls.Add(new Ball(maxX, maxY));
+            _balls.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                _balls.Add(new Ball(maxX, maxY));
+            }
         }
     }
 
     public override List<IBall> GetBalls()
     {
-        return new List<IBall>(_balls);
+        lock (_lockMatrix)
+        {
+            return new List<IBall>(_balls);
+        }
     }
 }
