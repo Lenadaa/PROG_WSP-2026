@@ -19,6 +19,8 @@ public class LogicLayerTests
         public void Move() { } 
         public void Start() { }
         public void Stop() { }
+        public int MoveCount { get; set; } = 0;
+        public void Start(Barrier barrier) { }
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
     
@@ -120,5 +122,31 @@ public class LogicLayerTests
         
         Assert.AreEqual(0, ball1.Velocity.Y);
         Assert.AreEqual(0, ball2.Velocity.Y);
+    }
+    
+    [TestMethod]
+    public async Task FairnessTest100Balls()
+    {
+        var logic = LogicAbstract.CreateAPI();
+        try
+        {
+            logic.CreateScene(100, 1000, 1000);
+            await Task.Delay(1000);
+        
+            logic.Stop();
+        
+            var balls = logic.GetBalls();
+            Assert.HasCount(100, balls);
+
+            int max = balls.Max(b => b.MoveCount);
+            int min = balls.Min(b => b.MoveCount);
+            int diff = max - min;
+
+            Assert.IsLessThanOrEqualTo(1, diff);
+        }
+        finally
+        {
+            logic.Stop();
+        }
     }
 }

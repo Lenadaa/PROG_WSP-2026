@@ -31,7 +31,7 @@ internal class LogicLayerImplementation : LogicAbstract
 {
 private readonly DataAbstract _data;
     private Board? _board;
-    
+    private Barrier? _barrier;
     private volatile bool _isRunning = false; 
     private Thread? _collisionThread;
     private Thread? _mainThread;
@@ -47,28 +47,43 @@ private readonly DataAbstract _data;
         _data.CreateBalls(ballCount, width, height);
         _board.AddBalls(_data.GetBalls());
         _isRunning = true;
+
+        _barrier = new Barrier(_board.Balls.Count + 1); 
+
         foreach (var ball in _board.Balls)
         {
-            ball.Start();
+            ball.Start(_barrier);
         }
+
         _mainThread = new Thread(() =>
         {
+            const int targetFrameMs = 16;
             try
             {
                 while (_isRunning)
                 {
+                    stopWatch.Restart();
+            
                     CheckCollisions();
-                    int timeToWait = 10 - (int)stopWatch.ElapsedMilliseconds;
-                    if (timeToWait > 0)
+            
+                    int elapsed = (int)stopWatch.ElapsedMilliseconds;
+                    int wait = targetFrameMs - elapsed;
+                    if (wait > 0)
                     {
-                        Thread.Sleep(timeToWait);
+                        Thread.Sleep(wait);
                     }
+            
+                    try
+                    {
+                        _barrier?.SignalAndWait();
+                    }
+                    catch (ObjectDisposedException) { break; }
+                    catch (BarrierPostPhaseException) { break; }
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
             }
         });
         _mainThread.IsBackground = true;
@@ -107,14 +122,19 @@ private readonly DataAbstract _data;
         
     }
     
-    public override void Stop()         // <-- TU
+    public override void Stop()
     {
+        if (!_isRunning) return;
         _isRunning = false;
+        
+        _barrier?.Dispose();
+        _barrier = null;
+
         if (_mainThread != null && _mainThread.IsAlive)
         {
             _mainThread.Join();
         }
-        
+
         if (_board != null)
         {
             foreach (var ball in _board.Balls)

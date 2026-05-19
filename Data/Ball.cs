@@ -26,10 +26,11 @@ public interface IBall : INotifyPropertyChanged
     
     object SyncRoot { get; }
 
+    int MoveCount { get; }
     /* @brief Updates the position of the ball based on velocity */
     void Move();
     
-    void Start();
+    void Start(Barrier barrier);
 
     void Stop();
 }
@@ -38,6 +39,7 @@ internal class Ball : IBall
     {
         private readonly Random _random = new();
         private volatile bool _isMoving;
+        private Barrier? _barrier;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public Vector Position { get; set; }
@@ -49,6 +51,9 @@ internal class Ball : IBall
         private Thread? _thread;
         private readonly object _lockObject;
         public object SyncRoot { get;  } = new object();
+        private int _moveCount;
+        public int MoveCount => Volatile.Read(ref _moveCount);
+        
         public Ball(double maxX, double maxY)
         {
             Mass = GenerateRandom(10, 20);
@@ -64,26 +69,25 @@ internal class Ball : IBall
                     while (_isMoving)
                     {
                         Move();
-                        Thread.Sleep(10);
+                        try
+                        {
+                            _barrier?.SignalAndWait();
+                        }
+                        catch (ObjectDisposedException) { break; }
+                        catch (BarrierPostPhaseException) { break; }
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine(e);
                 }
-                finally
-                {
-                    if (_thread != null)
-                    {
-                        Debug.WriteLine("Thread finished");
-                    }
-                }
             });
             _thread.IsBackground = true;
         }
 
-        public void Start()
+        public void Start(Barrier barrier)
         {
+            _barrier = barrier;
             _thread?.Start();
         }
 
@@ -102,6 +106,7 @@ internal class Ball : IBall
                 double newX = Position.X + Velocity.X;
                 double newY = Position.Y + Velocity.Y;
                 Position.Update(newX, newY);
+                Interlocked.Increment(ref _moveCount);
             }
         }
 
