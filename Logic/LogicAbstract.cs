@@ -197,14 +197,11 @@ private void CheckBallCollision(IBall ball, IBall otherBall)
         double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
         double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
 
-        double currentSpeed1 = Math.Sqrt(newVx1 * newVx1 + newVy1 * newVy1);
-        double currentSpeed2 = Math.Sqrt(newVx2 * newVx2 + newVy2 * newVy2);
-
-        ball.Velocity.X = (newVx1 / currentSpeed1) * initialSpeed1;
-        ball.Velocity.Y = (newVy1 / currentSpeed1) * initialSpeed1;
-
-        otherBall.Velocity.X = (newVx2 / currentSpeed2) * initialSpeed2;
-        otherBall.Velocity.Y = (newVy2 / currentSpeed2) * initialSpeed2;
+        ball.Velocity.X = newVx1;
+        ball.Velocity.Y = newVy1;
+        
+        otherBall.Velocity.X = newVx2;
+        otherBall.Velocity.Y = newVy2;
     }
 }
 }

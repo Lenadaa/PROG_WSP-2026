@@ -64,5 +64,45 @@ namespace BallsTests
             Assert.IsGreaterThan(0, ball.Radius);
             Assert.IsGreaterThan(0, ball.Mass);
         }
+
+        [TestMethod]
+        public void BallMoveTest()
+        {
+            var dataApi = DataAbstract.CreateAPI();
+            dataApi.CreateBalls(1, 100, 100);
+            var ball = dataApi.GetBalls()[0];
+            
+            ball.Position.Update(10, 10);
+            ball.Velocity = new Vector(2, -3);
+            
+            ball.Move();
+            
+            Assert.AreEqual(12, ball.Position.X);
+            Assert.AreEqual(7, ball.Position.Y);
+        }
+
+        [TestMethod]
+        public void BallPropertyChangesTest()
+        {
+            var dataApi = DataAbstract.CreateAPI();
+            dataApi.CreateBalls(1, 100, 100);
+            var ball = dataApi.GetBalls()[0];
+
+            bool eventRaised = false;
+
+            ball.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "Position")
+                {
+                    eventRaised = true;
+                }
+            };
+            
+            ball.Velocity = new Vector(2, 2);
+            
+            ball.Move();
+            
+            Assert.IsTrue(eventRaised);
+        }
     }
 }

@@ -62,4 +62,63 @@ public class LogicLayerTests
         double timePassed = (endTime - startTime).TotalMilliseconds;
         Assert.IsGreaterThanOrEqualTo(sampleDurationMs * 0.8, timePassed);
     }
+
+    [TestMethod]
+    public void WallCollisionTest()
+    {
+        var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
+        
+        logic.CreateScene(1, 100, 100);
+        
+        var ball = new BallStub
+        {
+            Position = new Vector(-5, 50),
+            Velocity = new Vector(-3, 2),
+            Radius = 5
+        };
+        
+        var method = typeof(LogicLayerImplementation).GetMethod("CheckBoundaryCollision", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+        method?.Invoke(logic, new object[] { ball });
+        
+        Assert.AreEqual(5, ball.Position.X);
+        Assert.AreEqual(3, ball.Velocity.X);
+        Assert.AreEqual(50, ball.Position.Y);
+        Assert.AreEqual(2, ball.Velocity.Y);
+    }
+
+    [TestMethod]
+    public void ElasticCollisionTest()
+    {
+        var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
+
+        var ball1 = new BallStub();
+        {
+            ball1.Position = new Vector(40, 50);
+            ball1.Velocity = new Vector(2, 0);
+            ball1.Mass = 10;
+            ball1.Radius = 5;
+        }
+        
+        var ball2 = new BallStub();
+        {
+            ball2.Position = new Vector(48, 50);
+            ball2.Velocity = new Vector(-2, 0);
+            ball2.Mass = 10;
+            ball2.Radius = 5;
+        }
+        
+        var method = typeof(LogicLayerImplementation).GetMethod("CheckBallCollision", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+        method?.Invoke(logic, new object[] { ball1, ball2 });
+        
+        Assert.AreEqual(39, ball1.Position.X);
+        Assert.AreEqual(49, ball2.Position.X);
+        
+        Assert.AreEqual(-2, ball1.Velocity.X);
+        Assert.AreEqual(2, ball2.Velocity.X);
+        
+        Assert.AreEqual(0, ball1.Velocity.Y);
+        Assert.AreEqual(0, ball2.Velocity.Y);
+    }
 }
