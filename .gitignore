@@ -25,3 +25,6 @@ Thumbs.db
 *.pdb
 *.json
 View/obj/Debug/net10.0-windows/apphost.exe
+*.dll
+*.cache
+*.pdb

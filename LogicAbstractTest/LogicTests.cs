@@ -207,7 +207,7 @@ public class LogicLayerTests
         {
             for (int i = 0; i < 10000; i++)
             {
-                ball.Move(); //
+                ball.Move(); 
             }
             keepRunning = false;
         });
