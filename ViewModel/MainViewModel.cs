@@ -73,6 +73,7 @@ public class MainViewModel : ViewModelBase
 
     private void StopSimulation()
     {
+        _model.Stop();
         Balls.Clear();
     }
 }

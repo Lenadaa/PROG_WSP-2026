@@ -18,6 +18,7 @@ public abstract class LogicAbstract
     // @brief Updates the state of the scene
     public abstract void UpdateTheState();
     public abstract List<IBall> GetBalls();
+    public abstract void Stop();
 
     // @brief Creates new instance of LogicLayerImplementation
     public static LogicAbstract CreateAPI(DataAbstract data = null)
@@ -86,8 +87,8 @@ private readonly DataAbstract _data;
             {
                 IBall ball2 = balls[j];
             
-                double dx = ball1.Position.X - ball2.Position.X;
-                double dy = ball1.Position.Y - ball2.Position.Y;
+                double dx = (ball1.Position.X + ball1.Radius) - (ball2.Position.X + ball2.Radius);
+                double dy = (ball1.Position.Y + ball1.Radius) - (ball2.Position.Y + ball2.Radius);
                 double distance = Math.Sqrt(dx * dx + dy * dy);
                 var first = ball1.GetHashCode() < ball2.GetHashCode() ? ball1 : ball2;
                 var second = first == ball1 ? ball2 : ball1;
@@ -105,103 +106,131 @@ private readonly DataAbstract _data;
     {
         
     }
+    
+    public override void Stop()         // <-- TU
+    {
+        _isRunning = false;
+        if (_mainThread != null && _mainThread.IsAlive)
+        {
+            _mainThread.Join();
+        }
+        
+        if (_board != null)
+        {
+            foreach (var ball in _board.Balls)
+            {
+                ball.Stop();
+            }
+        }
+    }
+    
     private void CheckBoundaryCollision(IBall ball)
     {
         if (_board == null) return;
 
-        double maxX = _board.Width - ball.Diameter;
-        double maxY = _board.Height - ball.Diameter;
-
-        double x = ball.Position.X;
-        double y = ball.Position.Y;
-        double vx = ball.Velocity.X;
-        double vy = ball.Velocity.Y;
-
-        bool collided = false;
-
-
-        while (x < 0 || x > maxX)
+        lock (ball.SyncRoot)
         {
-            if (x < 0)
-            {
-                x = -x;      
-                vx = Math.Abs(vx); 
-            }
-            else if (x > maxX)
-            {
-                x = 2 * maxX - x; 
-                vx = -Math.Abs(vx);
-            }
-            collided = true;
-        }
+            double maxX = _board.Width - ball.Diameter;
+            double maxY = _board.Height - ball.Diameter;
 
-        while (y < 0 || y > maxY)
-        {
-            if (y < 0)
-            {
-                y = -y;      
-                vy = Math.Abs(vy);
-            }
-            else if (y > maxY)
-            {
-                y = 2 * maxY - y; 
-                vy = -Math.Abs(vy);
-            }
-            collided = true;
-        }
+            double x = ball.Position.X;
+            double y = ball.Position.Y;
+            double vx = ball.Velocity.X;
+            double vy = ball.Velocity.Y;
 
-        if (collided)
-        {
-            ball.Position.X = x;
-            ball.Position.Y = y;
-            ball.Velocity.X = vx;
-            ball.Velocity.Y = vy;
+            bool collided = false;
+
+
+            while (x < 0 || x > maxX)
+            {
+                if (x < 0)
+                {
+                    x = -x;      
+                    vx = Math.Abs(vx); 
+                }
+                else if (x > maxX)
+                {
+                    x = 2 * maxX - x; 
+                    vx = -Math.Abs(vx);
+                }
+                collided = true;
+            }
+
+            while (y < 0 || y > maxY)
+            {
+                if (y < 0)
+                {
+                    y = -y;      
+                    vy = Math.Abs(vy);
+                }
+                else if (y > maxY)
+                {
+                    y = 2 * maxY - y; 
+                    vy = -Math.Abs(vy);
+                }
+                collided = true;
+            }
+
+            if (collided)
+            {
+                ball.Position.X = x;
+                ball.Position.Y = y;
+                ball.Velocity.X = vx;
+                ball.Velocity.Y = vy;
+            }
         }
     }
 
 private void CheckBallCollision(IBall ball, IBall otherBall)
 {
-    double dx = ball.Position.X - otherBall.Position.X;
-    double dy = ball.Position.Y - otherBall.Position.Y;
-    double distance = Math.Sqrt(dx * dx + dy * dy);
-    double minDistance = ball.Radius + otherBall.Radius;
-
-    if (distance <= minDistance && distance > 0)
+    var first = ball.GetHashCode() <= otherBall.GetHashCode() ? ball : otherBall;
+    var second = ReferenceEquals(first, ball) ? otherBall : ball;
+    
+    lock (first.SyncRoot)
+    lock (second.SyncRoot)
     {
-        double initialSpeed1 = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
-        double initialSpeed2 = Math.Sqrt(otherBall.Velocity.X * otherBall.Velocity.X + otherBall.Velocity.Y * otherBall.Velocity.Y);
+        double dx = (ball.Position.X + ball.Radius) - (otherBall.Position.X + otherBall.Radius);
+        double dy = (ball.Position.Y + ball.Radius) - (otherBall.Position.Y + otherBall.Radius);
+        double distance = Math.Sqrt(dx * dx + dy * dy);
+        double minDistance = ball.Radius + otherBall.Radius;
 
-        double overlap = minDistance - distance;
-        double nx = dx / distance;
-        double ny = dy / distance;
+        if (distance <= minDistance && distance > 0)
+        {
+            double initialSpeed1 = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
+            double initialSpeed2 = Math.Sqrt(otherBall.Velocity.X * otherBall.Velocity.X + otherBall.Velocity.Y * otherBall.Velocity.Y);
 
-        double totalMass = ball.Mass + otherBall.Mass;
-        double ratio1 = otherBall.Mass / totalMass;
-        double ratio2 = ball.Mass / totalMass;
+            double overlap = minDistance - distance;
+            double nx = dx / distance;
+            double ny = dy / distance;
 
-        ball.Position.X += nx * overlap * ratio1;
-        ball.Position.Y += ny * overlap * ratio1;
-        otherBall.Position.X -= nx * overlap * ratio2;
-        otherBall.Position.Y -= ny * overlap * ratio2;
+            double totalMass = ball.Mass + otherBall.Mass;
+            double ratio1 = otherBall.Mass / totalMass;
+            double ratio2 = ball.Mass / totalMass;
 
-        double dvx = ball.Velocity.X - otherBall.Velocity.X;
-        double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
-        double speedNormal = dvx * nx + dvy * ny;
+            ball.Position.X += nx * overlap * ratio1;
+            ball.Position.Y += ny * overlap * ratio1;
+            otherBall.Position.X -= nx * overlap * ratio2;
+            otherBall.Position.Y -= ny * overlap * ratio2;
 
-        if (speedNormal > 0) return; 
+            double dvx = ball.Velocity.X - otherBall.Velocity.X;
+            double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
+            double speedNormal = dvx * nx + dvy * ny;
 
-        double impulse = -2 * speedNormal / (1 / ball.Mass + 1 / otherBall.Mass);
+            if (speedNormal > 0) return; 
 
-        double newVx1 = ball.Velocity.X + (impulse * nx) / ball.Mass;
-        double newVy1 = ball.Velocity.Y + (impulse * ny) / ball.Mass;
-        double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
-        double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
+            double impulse = -2 * speedNormal / (1 / ball.Mass + 1 / otherBall.Mass);
 
-        ball.Velocity.X = newVx1;
-        ball.Velocity.Y = newVy1;
+            double newVx1 = ball.Velocity.X + (impulse * nx) / ball.Mass;
+            double newVy1 = ball.Velocity.Y + (impulse * ny) / ball.Mass;
+            double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
+            double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
+
+            ball.Velocity.X = newVx1;
+            ball.Velocity.Y = newVy1;
         
-        otherBall.Velocity.X = newVx2;
-        otherBall.Velocity.Y = newVy2;
+            otherBall.Velocity.X = newVx2;
+            otherBall.Velocity.Y = newVy2;
+        }
     }
 }
 }

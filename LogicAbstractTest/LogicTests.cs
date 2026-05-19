@@ -15,6 +15,7 @@ public class LogicLayerTests
         public double Mass { get; set; } = 1.0;
         public double Radius { get; set; } = 5.0;
         public double Diameter => Radius * 2;
+        public object SyncRoot { get; } = new object();
         public void Move() { } 
         public void Start() { }
         public void Stop() { }
@@ -47,18 +48,18 @@ public class LogicLayerTests
     {
         var logic = LogicAbstract.CreateAPI();
         int sampleDurationMs = 200;
-        
-        logic.CreateScene(2, 100, 100); 
-        
+
+        logic.CreateScene(2, 100, 100);
+
         var startTime = DateTime.Now;
         await Task.Delay(sampleDurationMs);
         var endTime = DateTime.Now;
 
-    
+
         var balls = logic.GetBalls();
         Assert.IsNotNull(balls);
         Assert.HasCount(2, balls);
-        
+
         double timePassed = (endTime - startTime).TotalMilliseconds;
         Assert.IsGreaterThanOrEqualTo(sampleDurationMs * 0.8, timePassed);
     }
@@ -67,7 +68,6 @@ public class LogicLayerTests
     public void WallCollisionTest()
     {
         var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
-        
         logic.CreateScene(1, 100, 100);
         
         var ball = new BallStub

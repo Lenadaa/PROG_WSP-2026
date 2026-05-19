@@ -23,11 +23,15 @@ public interface IBall : INotifyPropertyChanged
 
     /* @brief Diameter of the ball */
     double Diameter { get; }
+    
+    object SyncRoot { get; }
 
     /* @brief Updates the position of the ball based on velocity */
     void Move();
     
     void Start();
+
+    void Stop();
 }
 
 internal class Ball : IBall
@@ -44,6 +48,7 @@ internal class Ball : IBall
         public double Mass { get; set; }
         private Thread? _thread;
         private readonly object _lockObject;
+        public object SyncRoot { get;  } = new object();
         public Ball(double maxX, double maxY)
         {
             Mass = GenerateRandom(10, 20);
@@ -74,17 +79,30 @@ internal class Ball : IBall
                     }
                 }
             });
+            _thread.IsBackground = true;
         }
 
         public void Start()
         {
             _thread?.Start();
         }
+
+        public void Stop()
+        {
+            _isMoving = false;
+            if (_thread != null && _thread.IsAlive)
+            {
+                _thread.Join();
+            }
+        }
         public void Move()
-        { 
-            double newX = Position.X + Velocity.X;
-            double newY = Position.Y + Velocity.Y;
-            Position.Update(newX, newY);
+        {
+            lock (SyncRoot)
+            {
+                double newX = Position.X + Velocity.X;
+                double newY = Position.Y + Velocity.Y;
+                Position.Update(newX, newY);
+            }
         }
 
         private double GenerateRandom(double min, double max)
