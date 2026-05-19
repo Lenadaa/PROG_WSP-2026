@@ -10,6 +10,7 @@ internal class Board
     // @brief Width and height of the board
     public double Width { get; }
     public double Height { get; }
+    
     // @brief The list of the balls that are on the board
     public List<IBall> Balls { get; }
 

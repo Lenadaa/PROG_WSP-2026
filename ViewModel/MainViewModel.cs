@@ -1,13 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Windows.Input;
 using Data;
 using Model;
 using Presentation.ViewModel;
-using Timer = System.Threading.Timer;
 
 namespace ViewModel;
 
@@ -42,6 +39,7 @@ public class MainViewModel : ViewModelBase
     }
 
     public ObservableCollection<IBall> Balls { get; } = new();
+    
 
     public int BallCount
     {
