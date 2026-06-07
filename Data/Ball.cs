@@ -23,103 +23,93 @@ public interface IBall : INotifyPropertyChanged
 
     /* @brief Diameter of the ball */
     double Diameter { get; }
-    
-    object SyncRoot { get; }
 
     int MoveCount { get; }
-    /* @brief Updates the position of the ball based on velocity */
     void Move();
-    
-    void Start(Barrier barrier);
-
+    void Start();
     void Stop();
 }
 
 internal class Ball : IBall
+{
+    private readonly Random _random = new();
+    private volatile bool _isMoving;
+    private readonly Stopwatch _stopwatch = new(); // Dodany stoper
+    private double _lastTime; // Śledzenie czasu
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public Vector Position { get; set; }
+    public Vector Velocity { get; set; }
+    public double Radius { get; } = 10;
+    public double Diameter => Radius * 2;
+    public object SyncRoot { get; } = new object();
+    public double Mass { get; set; }
+    
+    private Thread? _thread;
+    private int _moveCount;
+    public int MoveCount => Volatile.Read(ref _moveCount);
+    
+    public Ball(double maxX, double maxY)
     {
-        private readonly Random _random = new();
-        private volatile bool _isMoving;
-        private Barrier? _barrier;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public Vector Position { get; set; }
-        public Vector Velocity { get; set; }
-        public double Radius { get; } = 10;
-        public double Diameter => Radius * 2;
-        public double Mass { get; set; }
-        private Thread? _thread;
-        public object SyncRoot { get;  } = new object();
-        private int _moveCount;
-        public int MoveCount => Volatile.Read(ref _moveCount);
+        Mass = GenerateRandom(10, 20);
+        Radius = Mass;
+        Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
+        Velocity = new Vector(GenerateRandom(-2,2), GenerateRandom(-2,2));
+        Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
+        _isMoving = true;
         
-        public Ball(double maxX, double maxY)
+        _thread = new Thread(() =>
         {
-            Mass = GenerateRandom(10, 20);
-            Radius = Mass;
-            Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
-            Velocity = new Vector(GenerateRandom(-2,2),GenerateRandom(-2,2));
-            Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
-            _isMoving = true;
-            _thread = new Thread(() =>
+            try
             {
-                try
+                _stopwatch.Start();
+                _lastTime = _stopwatch.Elapsed.TotalSeconds;
+
+                while (_isMoving)
                 {
-                    while (_isMoving)
-                    {
-                        Move();
-                        try
-                        {
-                            _barrier?.SignalAndWait();
-                        }
-                        catch (ObjectDisposedException) { break; }
-                        catch (BarrierPostPhaseException) { break; }
-                    }
+                    Move();
+                    Thread.Sleep(10); // Wciąż odciążamy procesor, ale fizyka jest niezależna od tego
                 }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            });
-            _thread.IsBackground = true;
-        }
-
-        public void Start(Barrier barrier)
-        {
-            _barrier = barrier;
-            _thread?.Start();
-        }
-
-        public void Stop()
-        {
-            _isMoving = false;
-            if (_thread != null && _thread.IsAlive)
-            {
-                _thread.Join();
             }
-        }
-        public void Move()
-        {
-            lock (SyncRoot)
+            catch (ThreadInterruptedException)
             {
-                double newX = Position.X + Velocity.X;
-                double newY = Position.Y + Velocity.Y;
-                Position.Update(newX, newY);
-                Interlocked.Increment(ref _moveCount);
+                Debug.WriteLine("Thread killed");
             }
-        }
-
-        private double GenerateRandom(double min, double max)
-        {
-            return _random.NextDouble() * (max - min) + min;
-        }
-
-        protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChangedEventHandler? handler = PropertyChanged;
-            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public override string ToString()
-        {
-            return "[Ball]- Postion" + Position.ToString() + "Velocity" + Velocity.ToString() + "Mass: " + Mass;
-        }
+        });
+        _thread.IsBackground = true;
     }
+
+    public void Start() => _thread?.Start();
+
+    public void Stop()
+    {
+        _isMoving = false;
+        if (_thread != null && _thread.IsAlive)
+            _thread.Interrupt(); 
+    }
+
+    public void Move()
+    {
+        double currentTime = _stopwatch.Elapsed.TotalSeconds;
+        double deltaTime = currentTime - _lastTime;
+        _lastTime = currentTime;
+
+        double timeScale = 60.0; 
+
+        double newX = Position.X + Velocity.X * deltaTime * timeScale;
+        double newY = Position.Y + Velocity.Y * deltaTime * timeScale;
+        
+        Position.Update(newX, newY);
+        Interlocked.Increment(ref _moveCount);
+    }
+
+    private double GenerateRandom(double min, double max) => _random.NextDouble() * (max - min) + min;
+
+    protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString() => 
+        $"[Ball] Position: {Position}, Velocity: {Velocity}, Mass: {Mass}";
+}

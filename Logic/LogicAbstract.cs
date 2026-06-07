@@ -29,14 +29,12 @@ public abstract class LogicAbstract
 
 internal class LogicLayerImplementation : LogicAbstract
 {
-private readonly DataAbstract _data;
+    private readonly DataAbstract _data;
     private Board? _board;
-    private Barrier? _barrier;
     private volatile bool _isRunning = false; 
     private Thread? _collisionThread;
-    private Thread? _mainThread;
-    private readonly Stopwatch stopWatch = new();
-    
+    public readonly object lockBall = new object();
+
     public LogicLayerImplementation(DataAbstract data)
     {
         _data = data;
@@ -48,46 +46,28 @@ private readonly DataAbstract _data;
         _board.AddBalls(_data.GetBalls());
         _isRunning = true;
 
-        _barrier = new Barrier(_board.Balls.Count + 1); 
-
         foreach (var ball in _board.Balls)
         {
-            ball.Start(_barrier);
+            ball.Start(); 
         }
 
-        _mainThread = new Thread(() =>
+        _collisionThread = new Thread(() =>
         {
-            const int targetFrameMs = 16;
             try
             {
                 while (_isRunning)
                 {
-                    stopWatch.Restart();
-            
                     CheckCollisions();
-            
-                    int elapsed = (int)stopWatch.ElapsedMilliseconds;
-                    int wait = targetFrameMs - elapsed;
-                    if (wait > 0)
-                    {
-                        Thread.Sleep(wait);
-                    }
-            
-                    try
-                    {
-                        _barrier?.SignalAndWait();
-                    }
-                    catch (ObjectDisposedException) { break; }
-                    catch (BarrierPostPhaseException) { break; }
+                    Thread.Sleep(5); 
                 }
             }
-            catch (Exception e)
+            catch (ThreadInterruptedException)
             {
-                Console.WriteLine(e);
+                Debug.WriteLine("Thread killed");
             }
         });
-        _mainThread.IsBackground = true;
-        _mainThread.Start();
+        _collisionThread.IsBackground = true;
+        _collisionThread.Start();
     }
     
     private void CheckCollisions()
@@ -97,7 +77,7 @@ private readonly DataAbstract _data;
         {
             IBall ball1 = balls[i];
             CheckBoundaryCollision(ball1);
-
+            
             for (int j = i + 1; j < balls.Count; j++) 
             {
                 IBall ball2 = balls[j];
@@ -127,12 +107,9 @@ private readonly DataAbstract _data;
         if (!_isRunning) return;
         _isRunning = false;
         
-        _barrier?.Dispose();
-        _barrier = null;
-
-        if (_mainThread != null && _mainThread.IsAlive)
+        if (_collisionThread != null && _collisionThread.IsAlive)
         {
-            _mainThread.Join();
+            _collisionThread.Interrupt();
         }
 
         if (_board != null)
@@ -148,7 +125,7 @@ private readonly DataAbstract _data;
     {
         if (_board == null) return;
 
-        lock (ball.SyncRoot)
+        lock (lockBall)
         {
             double maxX = _board.Width - ball.Diameter;
             double maxY = _board.Height - ball.Diameter;
@@ -160,34 +137,17 @@ private readonly DataAbstract _data;
 
             bool collided = false;
 
-
             while (x < 0 || x > maxX)
             {
-                if (x < 0)
-                {
-                    x = -x;      
-                    vx = Math.Abs(vx); 
-                }
-                else if (x > maxX)
-                {
-                    x = 2 * maxX - x; 
-                    vx = -Math.Abs(vx);
-                }
+                if (x < 0) { x = -x; vx = Math.Abs(vx); }
+                else if (x > maxX) { x = 2 * maxX - x; vx = -Math.Abs(vx); }
                 collided = true;
             }
 
             while (y < 0 || y > maxY)
             {
-                if (y < 0)
-                {
-                    y = -y;      
-                    vy = Math.Abs(vy);
-                }
-                else if (y > maxY)
-                {
-                    y = 2 * maxY - y; 
-                    vy = -Math.Abs(vy);
-                }
+                if (y < 0) { y = -y; vy = Math.Abs(vy); }
+                else if (y > maxY) { y = 2 * maxY - y; vy = -Math.Abs(vy); }
                 collided = true;
             }
 
@@ -202,12 +162,6 @@ private readonly DataAbstract _data;
     }
 
 private void CheckBallCollision(IBall ball, IBall otherBall)
-{
-    var first = ball.GetHashCode() <= otherBall.GetHashCode() ? ball : otherBall;
-    var second = ReferenceEquals(first, ball) ? otherBall : ball;
-    
-    lock (first.SyncRoot)
-    lock (second.SyncRoot)
     {
         double dx = (ball.Position.X + ball.Radius) - (otherBall.Position.X + otherBall.Radius);
         double dy = (ball.Position.Y + ball.Radius) - (otherBall.Position.Y + otherBall.Radius);
@@ -216,9 +170,6 @@ private void CheckBallCollision(IBall ball, IBall otherBall)
 
         if (distance <= minDistance && distance > 0)
         {
-            double initialSpeed1 = Math.Sqrt(ball.Velocity.X * ball.Velocity.X + ball.Velocity.Y * ball.Velocity.Y);
-            double initialSpeed2 = Math.Sqrt(otherBall.Velocity.X * otherBall.Velocity.X + otherBall.Velocity.Y * otherBall.Velocity.Y);
-
             double overlap = minDistance - distance;
             double nx = dx / distance;
             double ny = dy / distance;
@@ -245,12 +196,14 @@ private void CheckBallCollision(IBall ball, IBall otherBall)
             double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
             double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
 
-            ball.Velocity.X = newVx1;
-            ball.Velocity.Y = newVy1;
-        
-            otherBall.Velocity.X = newVx2;
-            otherBall.Velocity.Y = newVy2;
+            lock (lockBall)
+            {
+                ball.Velocity.X = newVx1;
+                ball.Velocity.Y = newVy1;
+            
+                otherBall.Velocity.X = newVx2;
+                otherBall.Velocity.Y = newVy2;
+            }
         }
     }
-}
 }
