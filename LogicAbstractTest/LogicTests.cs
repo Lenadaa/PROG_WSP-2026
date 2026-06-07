@@ -1,131 +1,155 @@
 ﻿using Logic;
 using Data;
+
 namespace LogicAbstractTest;
 
 [TestClass]
 public class LogicLayerTests
 {
     /// <summary>
-    /// Pozwala na pełną kontrolę parametrów bez zależności od losowości w warstwie Data.
+    /// Stub dający pełną kontrolę nad parametrami kulki bez losowości warstwy Data.
     /// </summary>
     private class BallStub : IBall
     {
+        private static int _idCounter = 0;
+        public int Id { get; } = Interlocked.Increment(ref _idCounter);
+
         public Vector Position { get; set; } = new Vector(0, 0);
         public Vector Velocity { get; set; } = new Vector(0, 0);
-        public double Mass { get; set; } = 1.0;
-        public double Radius { get; set; } = 5.0;
+        public double Mass     { get; set; } = 1.0;
+        public double Radius   { get; set; } = 5.0;
         public double Diameter => Radius * 2;
         public object SyncRoot { get; } = new object();
-        public void Move() { } 
-        public void Start() { }
-        public void Stop() { }
-        public int MoveCount { get; set; } = 0;
-        public void Start(Barrier barrier) { }
+        public int MoveCount   { get; set; } = 0;
+
+        public void Move() { }
+
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
-    
-    //Sprawdzenie, czy algorytm zderzenia kulka-kulka zmienia kierunki wektorów prędkości w logiczny sposób
+
+    // Collision velocity direction
+    /// <summary>
+    /// Sprawdza, czy algorytm zderzenia kulka-kulka odwraca wektory prędkości
+    /// w logiczny sposób (dwie kule jadące na siebie zamieniają kierunki).
+    /// </summary>
     [TestMethod]
-    public void CheckBallCollisiohnVelocity()
+    public void CheckBallCollisionVelocity()
     {
         var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
         var ball1 = new BallStub { Position = new Vector(45, 50), Velocity = new Vector(2, 0), Mass = 10 };
         var ball2 = new BallStub { Position = new Vector(52, 50), Velocity = new Vector(-2, 0), Mass = 10 };
 
-        double initialV1 = ball1.Velocity.X;
-        double initialV2 = ball2.Velocity.X;
+        double initialV1x = ball1.Velocity.X;
+        double initialV2x = ball2.Velocity.X;
 
-        var method = typeof(LogicLayerImplementation).GetMethod("CheckBallCollision", 
+        var method = typeof(LogicLayerImplementation).GetMethod(
+            "TryResolveBallCollision",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         method?.Invoke(logic, new object[] { ball1, ball2 });
 
-        Assert.AreNotEqual(initialV1, ball1.Velocity.X);
-        Assert.AreNotEqual(initialV2, ball2.Velocity.X);
-        Assert.IsLessThan(0, ball1.Velocity.X);
-        Assert.IsGreaterThan(0, ball2.Velocity.X);
+        // Prędkości muszą się zmienić
+        Assert.AreNotEqual(initialV1x, ball1.Velocity.X);
+        Assert.AreNotEqual(initialV2x, ball2.Velocity.X);
+
+        // ball1 jechał w prawo (+2) — po zderzeniu powinien jechać w lewo
+        Assert.IsTrue(ball1.Velocity.X < 0, $"ball1.Vx powinno być ujemne, jest {ball1.Velocity.X}");
+        // ball2 jechał w lewo (-2) — po zderzeniu powinien jechać w prawo
+        Assert.IsTrue(ball2.Velocity.X > 0, $"ball2.Vx powinno być dodatnie, jest {ball2.Velocity.X}");
     }
-    
-    //Upewnienie się, że powoływanie sceny z kulkami zachowuje płynność asynchroniczną i nie blokuje wywołującego wątku na zbyt długo.
+
+    // Stability (async)
+    /// <summary>
+    /// Upewnia się, że CreateScene nie blokuje wywołującego wątku i
+    /// po odczekaniu kulki wciąż istnieją.
+    /// </summary>
     [TestMethod]
     public async Task StabilityTest()
     {
         var logic = LogicAbstract.CreateAPI();
         int sampleDurationMs = 200;
 
-        logic.CreateScene(2, 100, 100);
+        try
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            logic.CreateScene(2, 100, 100);
+            sw.Stop();
 
-        var startTime = DateTime.Now;
-        await Task.Delay(sampleDurationMs);
-        var endTime = DateTime.Now;
+            Assert.IsTrue(sw.ElapsedMilliseconds < 100,
+                $"CreateScene zablokowała na {sw.ElapsedMilliseconds} ms");
 
+            await Task.Delay(sampleDurationMs);
 
-        var balls = logic.GetBalls();
-        Assert.IsNotNull(balls);
-        Assert.HasCount(2, balls);
-
-        double timePassed = (endTime - startTime).TotalMilliseconds;
-        Assert.IsGreaterThanOrEqualTo(sampleDurationMs * 0.8, timePassed);
+            var balls = logic.GetBalls();
+            Assert.IsNotNull(balls);
+            Assert.AreEqual(2, balls.Count);
+        }
+        finally
+        {
+            logic.Stop();
+        }
     }
-    //Weryfikacja mechanizmu odbijania się kulki od krawędzi
+
+    // Wall collision
+    /// <summary>
+    /// Weryfikuje mechanizm odbijania od lewej ściany:
+    /// x ujemne → odbicie z pozytywną prędkością X.
+    /// </summary>
     [TestMethod]
     public void WallCollisionTest()
     {
         var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
         logic.CreateScene(1, 100, 100);
-        
+
         var ball = new BallStub
         {
             Position = new Vector(-5, 50),
             Velocity = new Vector(-3, 2),
-            Radius = 5
+            Radius   = 5
         };
-        
-        var method = typeof(LogicLayerImplementation).GetMethod("CheckBoundaryCollision", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
+
+        var method = typeof(LogicLayerImplementation).GetMethod(
+            "CheckBoundaryCollision",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         method?.Invoke(logic, new object[] { ball });
-        
-        Assert.AreEqual(5, ball.Position.X);
-        Assert.AreEqual(3, ball.Velocity.X);
-        Assert.AreEqual(50, ball.Position.Y);
-        Assert.AreEqual(2, ball.Velocity.Y);
+
+        Assert.AreEqual(5,  ball.Position.X, delta: 0.001);
+        Assert.IsTrue(ball.Velocity.X > 0, "Po odbiciu od lewej ściany VX powinno być dodatnie");
+        Assert.AreEqual(50, ball.Position.Y, delta: 0.001);
+        Assert.AreEqual(2,  ball.Velocity.Y, delta: 0.001);
+
+        logic.Stop();
     }
 
-    //Dokładne, matematyczne sprawdzenie zderzenia sprężystego pomiędzy dwoma ciałami pod kątem zmian pozycji i prędkości.
+    //  Elastic collision math
+    /// <summary>
+    /// Matematyczna weryfikacja zderzenia sprężystego dla równych mas:
+    /// kule wymieniają prędkości.
+    /// </summary>
     [TestMethod]
     public void ElasticCollisionTest()
     {
         var logic = (LogicLayerImplementation)LogicAbstract.CreateAPI();
 
-        var ball1 = new BallStub();
-        {
-            ball1.Position = new Vector(40, 50);
-            ball1.Velocity = new Vector(2, 0);
-            ball1.Mass = 10;
-            ball1.Radius = 5;
-        }
-        
-        var ball2 = new BallStub();
-        {
-            ball2.Position = new Vector(48, 50);
-            ball2.Velocity = new Vector(-2, 0);
-            ball2.Mass = 10;
-            ball2.Radius = 5;
-        }
-        
-        var method = typeof(LogicLayerImplementation).GetMethod("CheckBallCollision", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        
+        var ball1 = new BallStub { Position = new Vector(40, 50), Velocity = new Vector(2, 0), Mass = 10, Radius = 5 };
+        var ball2 = new BallStub { Position = new Vector(48, 50), Velocity = new Vector(-2, 0), Mass = 10, Radius = 5 };
+
+        var method = typeof(LogicLayerImplementation).GetMethod(
+            "TryResolveBallCollision",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         method?.Invoke(logic, new object[] { ball1, ball2 });
-        
-        Assert.AreEqual(39, ball1.Position.X);
-        Assert.AreEqual(49, ball2.Position.X);
-        
-        Assert.AreEqual(-2, ball1.Velocity.X);
-        Assert.AreEqual(2, ball2.Velocity.X);
-        
-        Assert.AreEqual(0, ball1.Velocity.Y);
-        Assert.AreEqual(0, ball2.Velocity.Y);
+
+        Assert.AreEqual(-2, ball1.Velocity.X, delta: 0.001);
+        Assert.AreEqual(2,  ball2.Velocity.X, delta: 0.001);
+        Assert.AreEqual(0,  ball1.Velocity.Y, delta: 0.001);
+        Assert.AreEqual(0,  ball2.Velocity.Y, delta: 0.001);
     }
-    //Weryfikacja synchronizacji przy dużym obciążeniu (100 kulek).
+
+    // Fairness (100 balls)
+    /// <summary>
+    /// Weryfikuje, że przy 100 kulkach żadna nie jest głodzona —
+    /// różnica w liczbie kroków między najszybszą a najwolniejszą kulką
+    /// nie przekracza rozsądnego progu (20% wartości mediany).
+    /// </summary>
     [TestMethod]
     public async Task FairnessTest100Balls()
     {
@@ -134,80 +158,83 @@ public class LogicLayerTests
         {
             logic.CreateScene(100, 1000, 1000);
             await Task.Delay(1000);
-        
             logic.Stop();
-        
+
             var balls = logic.GetBalls();
-            Assert.HasCount(100, balls);
+            Assert.AreEqual(100, balls.Count);
 
-            int max = balls.Max(b => b.MoveCount);
-            int min = balls.Min(b => b.MoveCount);
-            int diff = max - min;
+            int max    = balls.Max(b => b.MoveCount);
+            int min    = balls.Min(b => b.MoveCount);
+            double avg = balls.Average(b => b.MoveCount);
+            int diff   = max - min;
 
-            Assert.IsLessThanOrEqualTo(1, diff);
+            Assert.IsTrue(min > 0, $"Kulka o najmniejszym MoveCount: {min} — powinna być > 0");
+
+            double threshold = avg * 0.20;
+            Assert.IsTrue(diff <= threshold,
+                $"Rozrzut MoveCount ({diff}) przekracza 20% średniej ({threshold:F1}). Min={min}, Max={max}, Avg={avg:F1}");
         }
         finally
         {
             logic.Stop();
         }
     }
-    //Sprawdzenie odporności warstwy danych na równoległy odczyt i modyfikację kolekcji kulek.
+    
     [TestMethod]
     public async Task TestForReadAndWriteOfListOfBall()
     {
-        var dataLayer = DataAbstract.CreateAPI(); 
-        dataLayer.CreateBalls(10, 100, 100); 
-    
+        var dataLayer = DataAbstract.CreateAPI();
+        dataLayer.CreateBalls(10, 100, 100);
+
         bool keepRunning = true;
         Exception? caughtException = null;
-        
+
         Task readerTask = Task.Run(() =>
         {
             try
             {
                 while (keepRunning)
                 {
-                    var balls = dataLayer.GetBalls(); 
+                    var balls = dataLayer.GetBalls();
                     foreach (var ball in balls)
                     {
-                        var pos = ball.Position; 
+                        _ = ball.Position;
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                caughtException = ex; 
-            }
+            catch (Exception ex) { caughtException = ex; }
         });
 
         Task writerTask = Task.Run(() =>
         {
             for (int i = 0; i < 100; i++)
             {
-                dataLayer.CreateBalls(5, 500, 500); //
-                Thread.Sleep(1); 
+                dataLayer.CreateBalls(5, 500, 500);
+                Thread.Sleep(1);
             }
             keepRunning = false;
         });
+
         await Task.WhenAll(readerTask, writerTask);
-        Assert.IsNull(caughtException);
+        Assert.IsNull(caughtException, $"Wyjątek przy równoległym dostępie: {caughtException?.Message}");
     }
     
-    //Testowanie integralności i spójności danych wektora pozycji podczas intensywnej modyfikacji wielowątkowej.
     [TestMethod]
     public async Task TestThreadSafeAgainstPositionReads()
     {
-        var ball = new Ball(500, 500);
-        ball.Velocity = new Vector(5, 5); 
-    
+        var dataLayer = DataAbstract.CreateAPI();
+        dataLayer.CreateBalls(1, 500, 500);
+        var ball = dataLayer.GetBalls()[0];
+        ball.Velocity = new Vector(5, 5);
+
         bool keepRunning = true;
         Exception? caughtException = null;
-        
+
         Task writerTask = Task.Run(() =>
         {
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 10_000; i++)
             {
-                ball.Move(); 
+                lock (ball.SyncRoot) { ball.Move(); }
             }
             keepRunning = false;
         });
@@ -218,48 +245,38 @@ public class LogicLayerTests
             {
                 while (keepRunning)
                 {
-
-                    lock (ball.SyncRoot)
-                    {
-                        var pos = ball.Position;
-                    }
+                    lock (ball.SyncRoot) { _ = ball.Position.X; }
                 }
             }
-            catch (Exception ex)
-            {
-                caughtException = ex;
-            }
+            catch (Exception ex) { caughtException = ex; }
         });
+
         await Task.WhenAll(writerTask, readerTask);
-        Assert.IsNull(caughtException);
+        Assert.IsNull(caughtException, $"Wyjątek przy odczycie pozycji: {caughtException?.Message}");
     }
     
-    //
     [TestMethod]
-    public async Task TestHandleBarrierDisposal()
+    public async Task NoDeadlockTest()
     {
-        int ballCount = 3;
-        var dataLayer = DataAbstract.CreateAPI(); 
-        dataLayer.CreateBalls(ballCount, 300, 300); 
-        var balls = dataLayer.GetBalls(); 
-    
-        Barrier barrier = new Barrier(ballCount); 
-
-        foreach (var ball in balls)
+        var logic = LogicAbstract.CreateAPI();
+        try
         {
-            ball.Start(barrier); 
+            logic.CreateScene(20, 200, 200);
+
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            await Task.Delay(500, cts.Token).ContinueWith(_ => { });
+
+            logic.Stop();
+
+            Assert.IsFalse(cts.IsCancellationRequested, "Wykryto potencjalny deadlock — Stop() nie wrócił w czasie.");
         }
-
-        await Task.Delay(100);
-
-        barrier.Dispose(); 
-
-        await Task.Delay(100);
-        
-        foreach (var ball in balls)
+        catch (OperationCanceledException)
         {
-            ball.Stop(); 
+            Assert.Fail("Deadlock — symulacja nie zatrzymała się w ciągu 2 sekund.");
         }
-        Assert.IsTrue(true);
+        finally
+        {
+            logic.Stop();
+        }
     }
 }

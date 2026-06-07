@@ -1,27 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Security;
 using Data;
 
 namespace Logic;
 
-/// <summary>
-/// @brief Abstract class for the logic layer.
-/// </summary>
 public abstract class LogicAbstract
 {
-    // @brief Creates the scene with the given parameters
-    // @param ballCount the number of balls on the board
-    // @param width the width of the board
     public abstract void CreateScene(int ballCount, double width, double height);
-    
-    // @brief Updates the state of the scene
     public abstract void UpdateTheState();
     public abstract List<IBall> GetBalls();
     public abstract void Stop();
 
-    // @brief Creates new instance of LogicLayerImplementation
-    public static LogicAbstract CreateAPI(DataAbstract data = null)
+    public static LogicAbstract CreateAPI(DataAbstract? data = null)
     {
         return new LogicLayerImplementation(data ?? DataAbstract.CreateAPI());
     }
@@ -31,16 +21,19 @@ internal class LogicLayerImplementation : LogicAbstract
 {
     private readonly DataAbstract _data;
     private Board? _board;
-    private volatile bool _isRunning = false; 
-    private Thread? _collisionThread;
-    public readonly object lockBall = new object();
+    private volatile bool _isRunning = false;
+
+    private readonly List<Thread> _ballThreads = new();
 
     public LogicLayerImplementation(DataAbstract data)
     {
         _data = data;
     }
+
     public override void CreateScene(int ballCount, double width, double height)
     {
+        Stop(); 
+
         _board = new Board(width, height);
         _data.CreateBalls(ballCount, width, height);
         _board.AddBalls(_data.GetBalls());
@@ -48,76 +41,94 @@ internal class LogicLayerImplementation : LogicAbstract
 
         foreach (var ball in _board.Balls)
         {
-            ball.Start(); 
+            var b = ball; 
+            var t = new Thread(() => BallLoop(b))
+            {
+                IsBackground = true,
+                Name = $"Ball-{b.Id}"
+            };
+            _ballThreads.Add(t);
         }
 
-        _collisionThread = new Thread(() =>
+        foreach (var t in _ballThreads)
+            t.Start();
+    }
+    
+    private void BallLoop(IBall ball)
+    {
+        try
         {
-            try
+            while (_isRunning)
             {
-                while (_isRunning)
+                lock (ball.SyncRoot)
                 {
-                    CheckCollisions();
-                    Thread.Sleep(5); 
+                    ball.Move();
+                    CheckBoundaryCollision(ball);
                 }
-            }
-            catch (ThreadInterruptedException)
-            {
-                Debug.WriteLine("Thread killed");
-            }
-        });
-        _collisionThread.IsBackground = true;
-        _collisionThread.Start();
-    }
-    
-    private void CheckCollisions()
-    {
-        var balls = GetBalls();
-        for (int i = 0; i < balls.Count; i++)
-        {
-            IBall ball1 = balls[i];
-            CheckBoundaryCollision(ball1);
-            
-            for (int j = i + 1; j < balls.Count; j++) 
-            {
-                IBall ball2 = balls[j];
-            
-                double dx = (ball1.Position.X + ball1.Radius) - (ball2.Position.X + ball2.Radius);
-                double dy = (ball1.Position.Y + ball1.Radius) - (ball2.Position.Y + ball2.Radius);
-                double distance = Math.Sqrt(dx * dx + dy * dy);
-                var first = ball1.GetHashCode() < ball2.GetHashCode() ? ball1 : ball2;
-                var second = first == ball1 ? ball2 : ball1;
-                if (distance <= ball1.Radius + ball2.Radius)
-                { 
-                    CheckBallCollision(ball1, ball2);
+
+                if (_board != null)
+                {
+                    foreach (var other in _board.Balls)
+                    {
+                        if (ReferenceEquals(ball, other)) continue;
+                        TryResolveBallCollision(ball, other);
+                    }
                 }
+
+                Thread.Sleep(10);
             }
         }
-    }
-
-    public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
-    
-    public override void UpdateTheState()
-    {
-        
-    }
-    
-    public override void Stop()
-    {
-        if (!_isRunning) return;
-        _isRunning = false;
-        
-        if (_collisionThread != null && _collisionThread.IsAlive)
+        catch (ThreadInterruptedException)
         {
-            _collisionThread.Interrupt();
+            Debug.WriteLine($"Thread {Thread.CurrentThread.Name} interrupted.");
         }
+    }
+    
+    private void TryResolveBallCollision(IBall a, IBall b)
+    {
+        var first  = a.Id < b.Id ? a : b;
+        var second = first.Id == a.Id ? b : a;
 
-        if (_board != null)
+        lock (first.SyncRoot)
+        lock (second.SyncRoot)
         {
-            foreach (var ball in _board.Balls)
-            {
-                ball.Stop();
-            }
+            double dx = (a.Position.X + a.Radius) - (b.Position.X + b.Radius);
+            double dy = (a.Position.Y + a.Radius) - (b.Position.Y + b.Radius);
+            double distance = Math.Sqrt(dx * dx + dy * dy);
+            double minDist  = a.Radius + b.Radius;
+
+            if (distance >= minDist || distance <= 0) return;
+
+            double overlap = minDist - distance;
+            double nx = dx / distance;
+            double ny = dy / distance;
+
+            double totalMass = a.Mass + b.Mass;
+            double ra = b.Mass / totalMass;   
+            double rb = a.Mass / totalMass;   
+
+            a.Position.X += nx * overlap * ra;
+            a.Position.Y += ny * overlap * ra;
+            b.Position.X -= nx * overlap * rb;
+            b.Position.Y -= ny * overlap * rb;
+
+            double dvx = a.Velocity.X - b.Velocity.X;
+            double dvy = a.Velocity.Y - b.Velocity.Y;
+            double speedAlongNormal = dvx * nx + dvy * ny;
+
+            if (speedAlongNormal > 0) return;
+
+            double impulse = -2.0 * speedAlongNormal / (1.0 / a.Mass + 1.0 / b.Mass);
+
+            a.Velocity.X += (impulse * nx) / a.Mass;
+            a.Velocity.Y += (impulse * ny) / a.Mass;
+            b.Velocity.X -= (impulse * nx) / b.Mass;
+            b.Velocity.Y -= (impulse * ny) / b.Mass;
+
+            Logger.Instance.Log(new LoggerData(
+                DateTime.UtcNow, "BallCollision", a.Id,
+                a.Position.X, a.Position.Y,
+                a.Velocity.X, a.Velocity.Y));
         }
     }
     
@@ -125,85 +136,70 @@ internal class LogicLayerImplementation : LogicAbstract
     {
         if (_board == null) return;
 
-        lock (lockBall)
+        double maxX = _board.Width  - ball.Diameter;
+        double maxY = _board.Height - ball.Diameter;
+
+        double x  = ball.Position.X;
+        double y  = ball.Position.Y;
+        double vx = ball.Velocity.X;
+        double vy = ball.Velocity.Y;
+        bool collided = false;
+
+        while (x < 0 || x > maxX)
         {
-            double maxX = _board.Width - ball.Diameter;
-            double maxY = _board.Height - ball.Diameter;
-
-            double x = ball.Position.X;
-            double y = ball.Position.Y;
-            double vx = ball.Velocity.X;
-            double vy = ball.Velocity.Y;
-
-            bool collided = false;
-
-            while (x < 0 || x > maxX)
+            if (x < 0)
             {
-                if (x < 0) { x = -x; vx = Math.Abs(vx); }
-                else if (x > maxX) { x = 2 * maxX - x; vx = -Math.Abs(vx); }
-                collided = true;
+                x = -x;         
+                vx =  Math.Abs(vx);
             }
+            else if (x > maxX) { x = 2 * maxX - x; vx = -Math.Abs(vx); }
+            collided = true;
+        }
 
-            while (y < 0 || y > maxY)
-            {
-                if (y < 0) { y = -y; vy = Math.Abs(vy); }
-                else if (y > maxY) { y = 2 * maxY - y; vy = -Math.Abs(vy); }
-                collided = true;
+        while (y < 0 || y > maxY)
+        {
+            if (y < 0){
+                y = -y;
+                vy = Math.Abs(vy);
             }
+            else if (y > maxY)
+            {
+                y = 2 * maxY - y;
+                vy = -Math.Abs(vy);
+            }
+            collided = true;
+        }
 
-            if (collided)
-            {
-                ball.Position.X = x;
-                ball.Position.Y = y;
-                ball.Velocity.X = vx;
-                ball.Velocity.Y = vy;
-            }
+        if (collided)
+        {
+            ball.Position.X = x;
+            ball.Position.Y = y;
+            ball.Velocity.X = vx;
+            ball.Velocity.Y = vy;
+
+            Logger.Instance.Log(new LoggerData(
+                DateTime.UtcNow, "WallCollision", ball.Id,
+                x, y, vx, vy));
         }
     }
 
-private void CheckBallCollision(IBall ball, IBall otherBall)
+    public override List<IBall> GetBalls() => _board?.Balls ?? new List<IBall>();
+
+    public override void UpdateTheState() { /* driven by per-ball threads */ }
+
+    public override void Stop()
     {
-        double dx = (ball.Position.X + ball.Radius) - (otherBall.Position.X + otherBall.Radius);
-        double dy = (ball.Position.Y + ball.Radius) - (otherBall.Position.Y + otherBall.Radius);
-        double distance = Math.Sqrt(dx * dx + dy * dy);
-        double minDistance = ball.Radius + otherBall.Radius;
+        if (!_isRunning) return;
+        _isRunning = false;
 
-        if (distance <= minDistance && distance > 0)
+        foreach (var t in _ballThreads)
         {
-            double overlap = minDistance - distance;
-            double nx = dx / distance;
-            double ny = dy / distance;
-
-            double totalMass = ball.Mass + otherBall.Mass;
-            double ratio1 = otherBall.Mass / totalMass;
-            double ratio2 = ball.Mass / totalMass;
-
-            ball.Position.X += nx * overlap * ratio1;
-            ball.Position.Y += ny * overlap * ratio1;
-            otherBall.Position.X -= nx * overlap * ratio2;
-            otherBall.Position.Y -= ny * overlap * ratio2;
-
-            double dvx = ball.Velocity.X - otherBall.Velocity.X;
-            double dvy = ball.Velocity.Y - otherBall.Velocity.Y;
-            double speedNormal = dvx * nx + dvy * ny;
-
-            if (speedNormal > 0) return; 
-
-            double impulse = -2 * speedNormal / (1 / ball.Mass + 1 / otherBall.Mass);
-
-            double newVx1 = ball.Velocity.X + (impulse * nx) / ball.Mass;
-            double newVy1 = ball.Velocity.Y + (impulse * ny) / ball.Mass;
-            double newVx2 = otherBall.Velocity.X - (impulse * nx) / otherBall.Mass;
-            double newVy2 = otherBall.Velocity.Y - (impulse * ny) / otherBall.Mass;
-
-            lock (lockBall)
-            {
-                ball.Velocity.X = newVx1;
-                ball.Velocity.Y = newVy1;
-            
-                otherBall.Velocity.X = newVx2;
-                otherBall.Velocity.Y = newVy2;
-            }
+            if (t.IsAlive) t.Interrupt();
         }
+
+        foreach (var t in _ballThreads)
+            t.Join(timeout:new TimeSpan(200));
+
+        _ballThreads.Clear();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Data;
@@ -9,107 +8,85 @@ namespace Data;
 /// </summary>
 public interface IBall : INotifyPropertyChanged
 {
-    /** @brief Current postion of the ball in 2D*/
+    /** @brief Unique identifier of the ball */
+    int Id { get; }
+
+    /** @brief Current position of the ball in 2D */
     Vector Position { get; }
 
-    /** @brief Current velocity vector of the ball*/
+    /** @brief Current velocity vector of the ball */
     Vector Velocity { get; set; }
 
-    /* @brief Current radius of the ball*/
+    /** @brief Current radius of the ball */
     double Radius { get; }
 
-    /* @brief Mass of the ball*/
+    /** @brief Mass of the ball */
     double Mass { get; }
 
-    /* @brief Diameter of the ball */
+    /** @brief Diameter of the ball */
     double Diameter { get; }
 
+    /** @brief Lock object for thread-safe access to this ball's data */
+    object SyncRoot { get; }
+
+    /** @brief Number of times Move() was called */
     int MoveCount { get; }
+
+    /**
+     * @brief Moves the ball by one step based on current velocity.
+     *        Should be called while holding SyncRoot lock.
+     */
     void Move();
-    void Start();
-    void Stop();
 }
 
 internal class Ball : IBall
 {
+    private static int _idCounter = 0;
+
     private readonly Random _random = new();
-    private volatile bool _isMoving;
-    private readonly Stopwatch _stopwatch = new(); // Dodany stoper
-    private double _lastTime; // Śledzenie czasu
+    private int _moveCount;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public Vector Position { get; set; }
+
+    public int Id { get; } = Interlocked.Increment(ref _idCounter);
+    public Vector Position { get; }
     public Vector Velocity { get; set; }
-    public double Radius { get; } = 10;
+    public double Radius { get; }
     public double Diameter => Radius * 2;
+    public double Mass { get; }
     public object SyncRoot { get; } = new object();
-    public double Mass { get; set; }
-    
-    private Thread? _thread;
-    private int _moveCount;
     public int MoveCount => Volatile.Read(ref _moveCount);
-    
+
     public Ball(double maxX, double maxY)
     {
-        Mass = GenerateRandom(10, 20);
+        Mass   = GenerateRandom(10, 20);
         Radius = Mass;
-        Position = new Vector(GenerateRandom(0, maxX - Diameter), GenerateRandom(0, maxY - Radius));
-        Velocity = new Vector(GenerateRandom(-2,2), GenerateRandom(-2,2));
+        Position = new Vector(
+            GenerateRandom(Radius, maxX - Diameter),
+            GenerateRandom(Radius, maxY - Diameter));
+        Velocity = new Vector(GenerateRandom(-3, 3), GenerateRandom(-3, 3));
+
         Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
-        _isMoving = true;
-        
-        _thread = new Thread(() =>
-        {
-            try
-            {
-                _stopwatch.Start();
-                _lastTime = _stopwatch.Elapsed.TotalSeconds;
-
-                while (_isMoving)
-                {
-                    Move();
-                    Thread.Sleep(10); // Wciąż odciążamy procesor, ale fizyka jest niezależna od tego
-                }
-            }
-            catch (ThreadInterruptedException)
-            {
-                Debug.WriteLine("Thread killed");
-            }
-        });
-        _thread.IsBackground = true;
     }
-
-    public void Start() => _thread?.Start();
-
-    public void Stop()
-    {
-        _isMoving = false;
-        if (_thread != null && _thread.IsAlive)
-            _thread.Interrupt(); 
-    }
-
     public void Move()
     {
-        double currentTime = _stopwatch.Elapsed.TotalSeconds;
-        double deltaTime = currentTime - _lastTime;
-        _lastTime = currentTime;
-
-        double timeScale = 60.0; 
-
-        double newX = Position.X + Velocity.X * deltaTime * timeScale;
-        double newY = Position.Y + Velocity.Y * deltaTime * timeScale;
-        
-        Position.Update(newX, newY);
+        Position.Update(
+            Position.X + Velocity.X,
+            Position.Y + Velocity.Y);
         Interlocked.Increment(ref _moveCount);
+
+        Logger.Instance.Log(new LoggerData(
+            DateTime.UtcNow, "Move", Id,
+            Position.X, Position.Y,
+            Velocity.X, Velocity.Y));
     }
 
-    private double GenerateRandom(double min, double max) => _random.NextDouble() * (max - min) + min;
+    private double GenerateRandom(double min, double max) =>
+        _random.NextDouble() * (max - min) + min;
 
-    protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
-    {
+    protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
-    public override string ToString() => 
-        $"[Ball] Position: {Position}, Velocity: {Velocity}, Mass: {Mass}";
+    public override string ToString() =>
+        $"[Ball #{Id}] Pos:{Position} Vel:{Velocity} Mass:{Mass:F1}";
 }
