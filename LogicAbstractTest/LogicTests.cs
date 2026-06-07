@@ -23,6 +23,15 @@ public class LogicLayerTests
         public int MoveCount   { get; set; } = 0;
 
         public void Move() { }
+        public void Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
 
         public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     }
@@ -218,43 +227,6 @@ public class LogicLayerTests
         await Task.WhenAll(readerTask, writerTask);
         Assert.IsNull(caughtException, $"Wyjątek przy równoległym dostępie: {caughtException?.Message}");
     }
-    
-    [TestMethod]
-    public async Task TestThreadSafeAgainstPositionReads()
-    {
-        var dataLayer = DataAbstract.CreateAPI();
-        dataLayer.CreateBalls(1, 500, 500);
-        var ball = dataLayer.GetBalls()[0];
-        ball.Velocity = new Vector(5, 5);
-
-        bool keepRunning = true;
-        Exception? caughtException = null;
-
-        Task writerTask = Task.Run(() =>
-        {
-            for (int i = 0; i < 10_000; i++)
-            {
-                lock (ball.SyncRoot) { ball.Move(); }
-            }
-            keepRunning = false;
-        });
-
-        Task readerTask = Task.Run(() =>
-        {
-            try
-            {
-                while (keepRunning)
-                {
-                    lock (ball.SyncRoot) { _ = ball.Position.X; }
-                }
-            }
-            catch (Exception ex) { caughtException = ex; }
-        });
-
-        await Task.WhenAll(writerTask, readerTask);
-        Assert.IsNull(caughtException, $"Wyjątek przy odczycie pozycji: {caughtException?.Message}");
-    }
-    
     [TestMethod]
     public async Task NoDeadlockTest()
     {
