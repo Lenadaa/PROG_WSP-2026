@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Timers;
 
 namespace Data;
 
@@ -35,25 +36,27 @@ public interface IBall : INotifyPropertyChanged
 
 internal class Ball : IBall
 {
-    // ── Static ID counter ─────────────────────────────────────────────────
     private static int _idCounter = 0;
 
-    // ── Fields ────────────────────────────────────────────────────────────
     private readonly Random _random = new();
     private volatile bool _isMoving;
 
     /// <summary>
     /// Stopwatch used for real-time delta-time calculation.
     /// Movement distance = velocity × deltaTime × timeScale
-    /// so physics are independent of Thread.Sleep intervals.
+    /// so physics are independent of the timer interval.
     /// </summary>
     private readonly Stopwatch _stopwatch = new();
     private double _lastTime;
 
+    private readonly System.Timers.Timer _moveTimer;
+    
     private Thread? _thread;
+    
+    private readonly AutoResetEvent _timerEvent = new(false);
+    
     private int _moveCount;
 
-    // ── Properties ────────────────────────────────────────────────────────
     public int Id { get; }
     public event PropertyChangedEventHandler? PropertyChanged;
     public Vector Position { get; set; }
@@ -81,31 +84,58 @@ internal class Ball : IBall
 
         Position.PropertyChanged += (s, e) => RaisePropertyChanged(nameof(Position));
 
-        _isMoving = true;
-
-        _thread = new Thread(RunLoop)
-        {
-            IsBackground = true,
-            Name = $"Ball#{Id}"
-        };
+        _moveTimer = new System.Timers.Timer(interval: 10);
+        _moveTimer.Elapsed  += OnTimerElapsed;
+        _moveTimer.AutoReset = true;
     }
 
+    private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        if (_isMoving)
+            _timerEvent.Set();
+    }
 
-    public void Start() => _thread?.Start();
+    public void Start()
+    {
+        if (_isMoving) return;
+
+        _isMoving = true;
+        
+        _stopwatch.Start();
+        _lastTime = _stopwatch.Elapsed.TotalSeconds;
+        
+        _thread = new Thread(ThreadLoop)
+        {
+            IsBackground = true,
+            Name = $"BallThread_{Id}" 
+        };
+        _thread.Start();
+
+        _moveTimer.Start();
+    }
 
     public void Stop()
     {
         _isMoving = false;
-        if (_thread != null && _thread.IsAlive)
-            _thread.Interrupt();
+        _moveTimer.Stop();
+        _moveTimer.Dispose();
+        
+        _timerEvent.Set(); 
     }
 
-    /// <summary>
-    /// Moves the ball by velocity × Δt × timeScale.
-    /// Δt is measured with a Stopwatch so the simulation runs at the same
-    /// physical speed regardless of how frequently Move() is called
-    /// (real-time / wall-clock coupling).
-    /// </summary>
+    private void ThreadLoop()
+    {
+        while (_isMoving)
+        {
+            _timerEvent.WaitOne();
+
+            if (_isMoving)
+            {
+                Move();
+            }
+        }
+    }
+    
     public void Move()
     {
         double currentTime = _stopwatch.Elapsed.TotalSeconds;
@@ -119,34 +149,13 @@ internal class Ball : IBall
 
         Position.Update(newX, newY);
         Interlocked.Increment(ref _moveCount);
-
-        Logger.Instance.LogMove(
-            Id, newX, newY, Velocity.X, Velocity.Y);
-    }
-    
-    private void RunLoop()
-    {
-        try
-        {
-            _stopwatch.Start();
-            _lastTime = _stopwatch.Elapsed.TotalSeconds;
-
-            while (_isMoving)
-            {
-                Move();
-                Thread.Sleep(10);  
-            }
-        }
-        catch (ThreadInterruptedException)
-        {
-            Debug.WriteLine($"[Ball#{Id}] Thread interrupted – stopping.");
-        }
+        
+        Logger.Instance.LogMove(Id, newX, newY, Velocity.X, Velocity.Y);
     }
 
     private double GenerateRandom(double min, double max) =>
         _random.NextDouble() * (max - min) + min;
 
-    /// <summary>Returns a velocity that is never exactly 0.</summary>
     private double GenerateNonZeroVelocity()
     {
         double v;

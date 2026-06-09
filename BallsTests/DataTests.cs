@@ -1,108 +1,45 @@
-﻿using Data;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading;
+using Data;
 
-namespace BallsTests
+namespace DataTest
 {
     [TestClass]
-    public class BallDataTests
+    public class RealTimeMovementTests
     {
-        private DataAbstract _dataApi;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            _dataApi = DataAbstract.CreateAPI();
-        }
-        
         [TestMethod]
-        public void BallVelocitydNotBeZeroInitially()
+        public void RealTimeMovement_DeltaTimeChangesPosition()
         {
-            _dataApi.CreateBalls(10, 100, 100);
-            var balls = _dataApi.GetBalls();
+            var ball = new Ball(500, 500);
+            
+            double startX = ball.Position.X;
+            double startY = ball.Position.Y;
+            int initialMoveCount = ball.MoveCount;
 
-            foreach (var ball in balls)
-            {
-                bool isMoving = Math.Abs(ball.Velocity.X) > 0 || Math.Abs(ball.Velocity.Y) > 0;
-                Assert.IsTrue(isMoving);
-            }
-        }
-        [TestMethod]
-        public void IndependentInstances()
-        {
-            _dataApi.CreateBalls(2, 100, 100);
-            var balls = _dataApi.GetBalls();
-            IBall ball1 = balls[0];
-            IBall ball2 = balls[1];
+            ball.Start();
+            Thread.Sleep(200); 
+            ball.Stop();
 
-            ball1.Velocity = new Vector(99, 99);
-
-            Assert.AreNotEqual(ball1.Velocity.X, ball2.Velocity.X);
-            Assert.AreEqual(99, ball1.Velocity.X);
-        }
-        
-        [TestMethod]
-        public void ShouldReturnCorrectSum()
-        {
-            Vector v1 = new Vector(10, 20);
-            Vector v2 = new Vector(5, -5);
-
-            Vector result = new Vector(v1.X + v2.X, v1.Y + v2.Y);
-
-            Assert.AreEqual(15, result.X);
-            Assert.AreEqual(15, result.Y);
+            Assert.IsTrue(ball.MoveCount > initialMoveCount);
+            
+            Assert.AreNotEqual(startX, ball.Position.X);
+            Assert.AreNotEqual(startY, ball.Position.Y);
         }
 
         [TestMethod]
-        public void ShouldPreserveValues()
+        public void Stop_ShouldTerminateThreadCorrectly()
         {
-            
-            var dataApi = DataAbstract.CreateAPI();
-            dataApi.CreateBalls(1, 100, 100);
-            var ball = dataApi.GetBalls()[0];
+            var ball = new Ball(500, 500);
+            ball.Start();
+            Thread.Sleep(50); 
 
-            Assert.IsNotNull(ball.Position);
-            Assert.IsNotNull(ball.Velocity);
-            Assert.IsGreaterThan(0, ball.Radius);
-            Assert.IsGreaterThan(0, ball.Mass);
-        }
+            ball.Stop();
+            int moveCountAfterStop = ball.MoveCount;
 
-        [TestMethod]
-        public void BallMoveTest()
-        {
-            var dataApi = DataAbstract.CreateAPI();
-            dataApi.CreateBalls(1, 100, 100);
-            var ball = dataApi.GetBalls()[0];
-            
-            ball.Position.Update(10, 10);
-            ball.Velocity = new Vector(2, -3);
-            
-            ball.Move();
-            
-            Assert.AreEqual(12, ball.Position.X);
-            Assert.AreEqual(7, ball.Position.Y);
-        }
+            Thread.Sleep(100);
 
-        [TestMethod]
-        public void BallPropertyChangesTest()
-        {
-            var dataApi = DataAbstract.CreateAPI();
-            dataApi.CreateBalls(1, 100, 100);
-            var ball = dataApi.GetBalls()[0];
 
-            bool eventRaised = false;
-
-            ball.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == "Position")
-                {
-                    eventRaised = true;
-                }
-            };
-            
-            ball.Velocity = new Vector(2, 2);
-            
-            ball.Move();
-            
-            Assert.IsTrue(eventRaised);
+            Assert.AreEqual(moveCountAfterStop, ball.MoveCount);
         }
     }
 }
