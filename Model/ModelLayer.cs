@@ -23,4 +23,10 @@ internal class ModelLayer : ModelAbstract
     public override void UpdateTheState() => _logic.UpdateTheState();
     
     public override void Stop() => _logic.Stop();
+    
+    public override void StartDrag(IBall ball)
+        => _logic.StartDrag(ball);
+
+    public override void StopDrag(IBall ball, double velocityX, double velocityY)
+        => _logic.StopDrag(ball, velocityX, velocityY);
 }

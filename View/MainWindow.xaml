@@ -19,7 +19,10 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <ItemsControl Grid.Row="0" ItemsSource="{Binding Balls}">
+            <ItemsControl x:Name="BallsControl"
+                          Grid.Row="0" ItemsSource="{Binding Balls}"
+                          MouseMove="BallsControl_MouseMove"
+                          MouseUp="BallsControl_MouseUp">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas Name="Canvas" SizeChanged="SizeChanged"
@@ -41,7 +44,8 @@
                         <Ellipse Width="{Binding Diameter}" 
                                  Height="{Binding Diameter}" 
                                  Fill="CornflowerBlue"
-                                 >
+                                 Cursor="Hand"
+                                 MouseDown="Ball_MouseDown">
                             <!-- <Ellipse.ToolTip> -->
                             <!--     <ToolTip> -->
                             <!--         <StackPanel> -->

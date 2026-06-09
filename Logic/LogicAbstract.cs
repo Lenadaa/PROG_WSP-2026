@@ -14,6 +14,9 @@ public abstract class LogicAbstract
     public abstract void UpdateTheState();
     public abstract List<IBall> GetBalls();
     public abstract void Stop();
+    
+    public abstract void StartDrag(IBall ball);
+    public abstract void StopDrag(IBall ball, double velocityX, double velocityY);
 
     public static LogicAbstract CreateAPI(DataAbstract? data = null)
     {
@@ -75,6 +78,17 @@ internal class LogicLayerImplementation : LogicAbstract
 
         Logger.Instance.Dispose();
     }
+    
+    public override void StartDrag(IBall ball)
+    {
+        ball.IsDragging = true;
+    }
+    
+    public override void StopDrag(IBall ball, double velocityX, double velocityY)
+    {
+        ball.Velocity = new Vector(velocityX, velocityY);
+        ball.IsDragging = false;
+    }
 
     private void CheckCollisions()
     {
@@ -103,6 +117,8 @@ internal class LogicLayerImplementation : LogicAbstract
     private void CheckBoundaryCollision(IBall ball)
     {
         if (_board == null) return;
+        
+        if (ball.IsDragging) return;
 
         lock (ball)
         {
@@ -161,6 +177,8 @@ internal class LogicLayerImplementation : LogicAbstract
 
     private void CheckBallCollision(IBall ball, IBall otherBall)
     {
+        if (ball.IsDragging || otherBall.IsDragging) return;
+        
         IBall firstLock = ball.Id < otherBall.Id ? ball : otherBall;
         IBall secondLock = ball.Id < otherBall.Id ? otherBall : ball;
 
@@ -181,6 +199,34 @@ internal class LogicLayerImplementation : LogicAbstract
                 double nx = dx / distance;
                 double ny = dy / distance;
 
+                if (ball.IsDragging)
+                {
+                    otherBall.Position.X -= nx * overlap;
+                    otherBall.Position.Y -= ny * overlap;
+                    
+                    double dvx1 = ball.Velocity.X - otherBall.Velocity.X;
+                    double dvy1 = ball.Velocity.Y - otherBall.Velocity.Y;
+                    double speedNormal1 = dvx1 * nx + dvy1 * ny;
+                    if (speedNormal1 >= 0) return;
+                    otherBall.Velocity.X += 2 * speedNormal1 * nx;
+                    otherBall.Velocity.Y += 2 * speedNormal1 * ny;
+                    return;
+                }
+
+                if (otherBall.IsDragging)
+                {
+                    ball.Position.X += nx * overlap;
+                    ball.Position.Y += ny * overlap;
+
+                    double dvx2 = ball.Velocity.X - otherBall.Velocity.X;
+                    double dvy2 = ball.Velocity.Y - otherBall.Velocity.Y;
+                    double speedNormal2 = dvx2 * nx + dvy2 * ny;
+                    if (speedNormal2 >= 0) return;
+                    ball.Velocity.X -= 2 * speedNormal2 * nx;
+                    ball.Velocity.Y -= 2 * speedNormal2 * ny;
+                    return;
+                }
+                
                 double totalMass = ball.Mass + otherBall.Mass;
                 double ratio1 = otherBall.Mass / totalMass;
                 double ratio2 = ball.Mass / totalMass;

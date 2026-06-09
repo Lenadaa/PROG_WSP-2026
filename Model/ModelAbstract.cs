@@ -9,6 +9,9 @@ public abstract class ModelAbstract
     public abstract List<IBall> GetBalls();
     public abstract void UpdateTheState(); 
     public abstract void Stop();
+    
+    public abstract void StartDrag(IBall ball);
+    public abstract void StopDrag(IBall ball, double velocityX, double velocityY);
 
     public static ModelAbstract Create(LogicAbstract? logic = null)
     {

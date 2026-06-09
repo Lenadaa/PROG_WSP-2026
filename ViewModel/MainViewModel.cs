@@ -49,6 +49,11 @@ public class MainViewModel : ViewModelBase
 
     public ICommand StartSimulationCommand { get; }
     public ICommand StopSimulationCommand { get; }
+    
+    private IBall?   _draggedBall;
+    private double   _prevMouseX, _prevMouseY;
+    private double   _currMouseX, _currMouseY;
+    private DateTime _prevTime,   _currTime;
 
     public MainViewModel()
     {
@@ -73,5 +78,55 @@ public class MainViewModel : ViewModelBase
     {
         _model.Stop();
         Balls.Clear();
+    }
+    
+    public void StartDrag(IBall ball)
+    {
+        _draggedBall = ball;
+        _currTime    = DateTime.Now;
+        _model.StartDrag(ball);
+    }
+    
+    public void MoveDrag(double x, double y)
+    {
+        if (_draggedBall == null) return;
+
+        _prevMouseX = _currMouseX;
+        _prevMouseY = _currMouseY;
+        _prevTime   = _currTime;
+
+        _currMouseX = x;
+        _currMouseY = y;
+        _currTime   = DateTime.Now;
+
+        double dt = (_currTime - _prevTime).TotalSeconds;
+        if (dt > 0.001)
+        {
+            const double timeScale = 60.0;
+            _draggedBall.Velocity.X = (_currMouseX - _prevMouseX) / (dt * timeScale);
+            _draggedBall.Velocity.Y = (_currMouseY - _prevMouseY) / (dt * timeScale);
+        }
+
+        lock (_draggedBall)
+        {
+            _draggedBall.Position.Update(x, y);
+        }
+    }
+    
+    public void EndDrag()
+    {
+        if (_draggedBall == null) return;
+        
+        double dt = (_currTime - _prevTime).TotalSeconds;
+        double vx = 0, vy = 0;
+        if (dt > 0.001)
+        {
+            const double timeScale = 60.0;
+            vx = (_currMouseX - _prevMouseX) / (dt * timeScale);
+            vy = (_currMouseY - _prevMouseY) / (dt * timeScale);
+        }
+
+        _model.StopDrag(_draggedBall, vx, vy);
+        _draggedBall = null;
     }
 }

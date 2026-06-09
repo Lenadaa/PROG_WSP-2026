@@ -29,6 +29,7 @@ public interface IBall : INotifyPropertyChanged
     double Diameter { get; }
 
     int MoveCount { get; }
+    bool IsDragging { get; set; }
     void Move();
     void Start();
     void Stop();
@@ -40,6 +41,7 @@ internal class Ball : IBall
 
     private readonly Random _random = new();
     private volatile bool _isMoving;
+    private volatile bool _isDragging;
 
     /// <summary>
     /// Stopwatch used for real-time delta-time calculation.
@@ -66,6 +68,18 @@ internal class Ball : IBall
     public object SyncRoot { get; } = new object();
     public double Mass { get; set; }
     public int MoveCount => Volatile.Read(ref _moveCount);
+    
+    public bool IsDragging
+    {
+        get => _isDragging;
+        set
+        {
+            if (_isDragging && !value)
+                _lastTime = _stopwatch.Elapsed.TotalSeconds;
+
+            _isDragging = value;
+        }
+    }
 
     public Ball(double maxX, double maxY)
     {
@@ -129,7 +143,7 @@ internal class Ball : IBall
         {
             _timerEvent.WaitOne();
 
-            if (_isMoving)
+            if (_isMoving && !_isDragging)
             {
                 Move();
             }
