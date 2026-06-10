@@ -13,6 +13,9 @@ public abstract class ModelAbstract
     public abstract void StartDrag(IBall ball);
     public abstract void StopDrag(IBall ball, double velocityX, double velocityY);
 
+    public abstract double BoardWidth  { get; }
+    public abstract double BoardHeight { get; }
+    
     public static ModelAbstract Create(LogicAbstract? logic = null)
     {
         return new ModelLayer(logic ?? LogicAbstract.CreateAPI());

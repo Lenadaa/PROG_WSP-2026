@@ -90,6 +90,15 @@ public class MainViewModel : ViewModelBase
     public void MoveDrag(double x, double y)
     {
         if (_draggedBall == null) return;
+        
+        double maxX = _model.BoardWidth  - _draggedBall.Diameter;
+        double maxY = _model.BoardHeight - _draggedBall.Diameter;
+        if (maxX < 0) maxX = 0;
+        if (maxY < 0) maxY = 0;
+        if (x < 0)    x = 0;
+        if (y < 0)    y = 0;
+        if (x > maxX) x = maxX;
+        if (y > maxY) y = maxY;
 
         _prevMouseX = _currMouseX;
         _prevMouseY = _currMouseY;
@@ -112,11 +121,11 @@ public class MainViewModel : ViewModelBase
             _draggedBall.Position.Update(x, y);
         }
     }
-    
+
     public void EndDrag()
     {
         if (_draggedBall == null) return;
-        
+
         double dt = (_currTime - _prevTime).TotalSeconds;
         double vx = 0, vy = 0;
         if (dt > 0.001)

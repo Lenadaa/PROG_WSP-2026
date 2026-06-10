@@ -29,4 +29,7 @@ internal class ModelLayer : ModelAbstract
 
     public override void StopDrag(IBall ball, double velocityX, double velocityY)
         => _logic.StopDrag(ball, velocityX, velocityY);
+    
+    public override double BoardWidth  => _logic.BoardWidth;
+    public override double BoardHeight => _logic.BoardHeight;
 }
