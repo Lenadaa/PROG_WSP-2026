@@ -177,7 +177,7 @@ internal class LogicLayerImplementation : LogicAbstract
 
     private void CheckBallCollision(IBall ball, IBall otherBall)
     {
-        if (ball.IsDragging || otherBall.IsDragging) return;
+        if (ball.IsDragging && otherBall.IsDragging) return;
         
         IBall firstLock = ball.Id < otherBall.Id ? ball : otherBall;
         IBall secondLock = ball.Id < otherBall.Id ? otherBall : ball;
